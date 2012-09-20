@@ -1,15 +1,12 @@
 +!waypointerInit: mypos(0,0)
-	<-
-	.println("Staring from TL.");
-	+current_waypoint_id(0);
-	+current_waypoint(10,10).
+	<-	.println("Staring from TL.");
+		+current_waypoint_id(0);
+		+current_waypoint(10,10).
 
 +!waypointerInit: mypos(59,59)
-	<-
-	.println("Staring from BR.");
-	+current_waypoint_id(2);
-	+current_waypoint(49,49).
-
+	<-	.println("Staring from BR.");
+		+current_waypoint_id(2);
+		+current_waypoint(49,49).
 
 
 +!askWaypointer

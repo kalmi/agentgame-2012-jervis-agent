@@ -8,7 +8,7 @@
 *******************************************************************************/
 
 
-package kalmi.AI.Debug;
+package jervis.AI.Debug;
 
 
 import java.awt.BorderLayout;

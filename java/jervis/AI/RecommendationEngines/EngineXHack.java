@@ -1,10 +1,11 @@
-package kalmi.AI.RecommendationEngines;
+package jervis.AI.RecommendationEngines;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-import kalmi.AI.State;
-import kalmi.CommonTypes.MyDir;
+import jervis.AI.State;
+import jervis.CommonTypes.MyDir;
+
 
 
 public class EngineXHack implements RecommendationEngine {

@@ -1,4 +1,4 @@
-package kalmi.JasonLayer;
+package jervis.JasonLayer;
 
 public enum LiteralType {
 	food,

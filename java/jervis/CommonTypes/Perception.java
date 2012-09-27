@@ -1,4 +1,4 @@
-package kalmi.CommonTypes;
+package jervis.CommonTypes;
 
 import java.awt.Point;
 import java.util.Iterator;
@@ -6,8 +6,8 @@ import java.util.List;
 
 import jason.asSyntax.Literal;
 import jason.bb.BeliefBase;
-import kalmi.JasonLayer.BeliefParser;
-import kalmi.JasonLayer.LiteralType;
+import jervis.JasonLayer.BeliefParser;
+import jervis.JasonLayer.LiteralType;
 
 public class Perception {
 

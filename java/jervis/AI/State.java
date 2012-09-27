@@ -1,9 +1,10 @@
-package kalmi.AI;
+package jervis.AI;
 
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
-import kalmi.CommonTypes.Food;
+
+import jervis.CommonTypes.Food;
 
 
 public class State {

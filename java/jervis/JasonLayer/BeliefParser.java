@@ -1,4 +1,4 @@
-package kalmi.JasonLayer;
+package jervis.JasonLayer;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -7,9 +7,9 @@ import java.util.List;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
-import kalmi.CommonTypes.Food;
-import kalmi.CommonTypes.MyDir;
-import kalmi.CommonTypes.PerceptedAgent;
+import jervis.CommonTypes.Food;
+import jervis.CommonTypes.MyDir;
+import jervis.CommonTypes.PerceptedAgent;
 
 public class BeliefParser {
 	

@@ -1,4 +1,4 @@
-package kalmi.CommonTypes;
+package jervis.CommonTypes;
 
 import java.awt.Point;
 

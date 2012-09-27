@@ -1,9 +1,10 @@
-package kalmi.AI.RecommendationEngines;
+package jervis.AI.RecommendationEngines;
 
 import java.util.Set;
 
-import kalmi.AI.State;
-import kalmi.CommonTypes.MyDir;
+import jervis.AI.State;
+import jervis.CommonTypes.MyDir;
+
 
 
 public interface RecommendationEngine {

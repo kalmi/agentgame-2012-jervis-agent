@@ -1,4 +1,4 @@
-package kalmi.JasonLayer.Commands;
+package jervis.JasonLayer.Commands;
 
 public class Wait extends Command {
 	public Wait(){

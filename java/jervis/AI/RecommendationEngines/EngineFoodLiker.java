@@ -1,4 +1,4 @@
-package kalmi.AI.RecommendationEngines;
+package jervis.AI.RecommendationEngines;
 
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -7,9 +7,10 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-import kalmi.AI.Agent;
-import kalmi.AI.State;
-import kalmi.CommonTypes.MyDir;
+import jervis.AI.Agent;
+import jervis.AI.State;
+import jervis.CommonTypes.MyDir;
+
 
 
 

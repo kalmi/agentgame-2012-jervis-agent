@@ -1,14 +1,15 @@
-package kalmi.AI;
+package jervis.AI;
 
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-import kalmi.AI.RecommendationEngines.EngineFoodLiker;
-import kalmi.AI.RecommendationEngines.EngineMultiplePathRouter;
-import kalmi.AI.RecommendationEngines.EngineWallDisliker;
-import kalmi.AI.RecommendationEngines.RecommendationEngine;
-import kalmi.CommonTypes.MyDir;
+import jervis.AI.RecommendationEngines.EngineFoodLiker;
+import jervis.AI.RecommendationEngines.EngineMultiplePathRouter;
+import jervis.AI.RecommendationEngines.EngineWallDisliker;
+import jervis.AI.RecommendationEngines.RecommendationEngine;
+import jervis.CommonTypes.MyDir;
+
 
 public class Agent {
     public int id;

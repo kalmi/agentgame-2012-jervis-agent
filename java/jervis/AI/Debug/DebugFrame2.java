@@ -1,4 +1,4 @@
-package kalmi.AI.Debug;
+package jervis.AI.Debug;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -16,7 +16,8 @@ import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import java.util.ArrayList;
 
-import kalmi.AI.State;
+import jervis.AI.State;
+
 
 
 @SuppressWarnings("serial")

@@ -1,6 +1,6 @@
-package kalmi.JasonLayer.Commands;
+package jervis.JasonLayer.Commands;
 
-import kalmi.CommonTypes.MyDir;
+import jervis.CommonTypes.MyDir;
 
 public class Move extends Command {
 	public Move(MyDir dir){

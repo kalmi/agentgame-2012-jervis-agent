@@ -1,10 +1,10 @@
-package kalmi;
+package jervis;
 
 import jason.asSemantics.*;
 import jason.asSyntax.*;
-import kalmi.AI.Controller;
-import kalmi.CommonTypes.Perception;
-import kalmi.JasonLayer.Commands.Command;
+import jervis.AI.Controller;
+import jervis.CommonTypes.Perception;
+import jervis.JasonLayer.Commands.Command;
 
 
 public class main extends DefaultInternalAction{

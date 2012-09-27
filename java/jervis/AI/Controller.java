@@ -1,17 +1,18 @@
-package kalmi.AI;
+package jervis.AI;
 
 import java.awt.Point;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-import kalmi.AI.Debug.DebugFrame2;
-import kalmi.AI.RecommendationEngines.EngineBevarosPathRouter;
-import kalmi.AI.RecommendationEngines.RecommendationEngine;
-import kalmi.CommonTypes.Food;
-import kalmi.CommonTypes.MyDir;
-import kalmi.CommonTypes.Perception;
-import kalmi.JasonLayer.Commands.*;
+import jervis.AI.Debug.DebugFrame2;
+import jervis.AI.RecommendationEngines.EngineBevarosPathRouter;
+import jervis.AI.RecommendationEngines.RecommendationEngine;
+import jervis.CommonTypes.Food;
+import jervis.CommonTypes.MyDir;
+import jervis.CommonTypes.Perception;
+import jervis.JasonLayer.Commands.*;
+
 
 
 

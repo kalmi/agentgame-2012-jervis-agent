@@ -1,4 +1,4 @@
-package kalmi;
+package kalmi.AI.Debug;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -10,16 +10,16 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
-import javax.swing.JTextPane;
-import java.awt.TextArea;
 import java.util.ArrayList;
-import java.util.Arrays;
 
+import kalmi.AI.State;
+
+
+@SuppressWarnings("serial")
 public class DebugFrame2 extends JFrame implements ChangeListener{
 
 	private JPanel contentPane;
@@ -47,7 +47,6 @@ public class DebugFrame2 extends JFrame implements ChangeListener{
 	/**
 	 * Create the frame.
 	 */
-	@SuppressWarnings("serial")
 	public DebugFrame2() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 900, 700);
@@ -163,25 +162,25 @@ public class DebugFrame2 extends JFrame implements ChangeListener{
 			}
 
 			public int getRowCount() {
-				return state.agents.size();
+				return state.agents.length;
 			}
 
 			public Object getValueAt(int rowIndex, int columnIndex) {
-				int key = (Integer) state.agents.keySet().toArray()[rowIndex];
+				int key = rowIndex;
 				if(columnIndex == 0){
-					return state.agents.get(key).id;
+					return state.agents[key].id;
 				}
 				else if(columnIndex == 1){
-					return state.agents.get(key).direction.name();
+					return state.agents[key].direction.name();
 				}
 				else if(columnIndex == 2){
-					return state.agents.get(key).position.x;
+					return state.agents[key].position.x;
 				}
 				else if(columnIndex == 3){
-					return state.agents.get(key).position.y;
+					return state.agents[key].position.y;
 				}
 				else if(columnIndex == 4){
-					return state.agents.get(key).claustrofobicness;
+					return state.agents[key].claustrofobicness;
 				}
 				return "ERROR";
 				

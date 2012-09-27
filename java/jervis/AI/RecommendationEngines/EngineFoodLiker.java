@@ -1,14 +1,16 @@
-package kalmi;
-
-import jason.stdlib.concat;
+package kalmi.AI.RecommendationEngines;
 
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
+
+import kalmi.AI.Agent;
+import kalmi.AI.State;
+import kalmi.CommonTypes.MyDir;
+
 
 
 public class EngineFoodLiker implements RecommendationEngine {
@@ -31,7 +33,7 @@ public class EngineFoodLiker implements RecommendationEngine {
 	
 	public boolean okForAgent(Point food, Agent agent){
 		//ArrayList<Rectangle> bounds = boundListPerAgent.get(agent.id-1);
-		Rectangle r = boundPerAgent.get(agent.id-1);
+		Rectangle r = boundPerAgent.get(agent.id);
 		boolean inBound = false;
 		//for (Rectangle r : bounds) {
 			if(r.contains(food))
@@ -46,7 +48,7 @@ public class EngineFoodLiker implements RecommendationEngine {
 		if(state.foods.size() == 0)
 			return result;
 		
-		Agent agent = state.agents.get(myId);
+		Agent agent = state.agents[myId];
 		
 		Point closestFood = null;
 		int closestDistance = Integer.MAX_VALUE;
@@ -57,23 +59,26 @@ public class EngineFoodLiker implements RecommendationEngine {
 			
 			
 			
-			int closestToAgent = -1;
+			Agent closestToAgent = null;
 			int closestDistanceToAgent = Integer.MAX_VALUE;
 			
-			for (Entry<Integer, Agent> entry : state.agents.entrySet()) {
+			for (Agent otherAgent : state.agents) {
 				
-				if(!okForAgent(food, entry.getValue()))
+				if(otherAgent == null)
 					continue;
 				
-				Agent a = entry.getValue();
+				if(!okForAgent(food, otherAgent))
+					continue;
+				
+				Agent a = otherAgent;
 				int d = Math.abs(food.x - a.position.x) + Math.abs(food.y - a.position.y);
 				if(closestDistanceToAgent > d){
 					closestDistanceToAgent = d;
-					closestToAgent = entry.getKey();
+					closestToAgent = otherAgent;
 				}
 			}
 			
-			if(closestToAgent != myId) continue;
+			if(closestToAgent != agent) continue;
 			
 			 
 			if(closestDistanceToAgent < closestDistance){

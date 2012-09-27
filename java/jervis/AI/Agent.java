@@ -1,13 +1,15 @@
-package kalmi;
+package kalmi.AI;
 
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * Class Agent
- * A belief containing all sort of infos about an agent.
- */
+import kalmi.AI.RecommendationEngines.EngineFoodLiker;
+import kalmi.AI.RecommendationEngines.EngineMultiplePathRouter;
+import kalmi.AI.RecommendationEngines.EngineWallDisliker;
+import kalmi.AI.RecommendationEngines.RecommendationEngine;
+import kalmi.CommonTypes.MyDir;
+
 public class Agent {
     public int id;
     public Point position;

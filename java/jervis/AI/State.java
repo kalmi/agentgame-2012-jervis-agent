@@ -1,19 +1,17 @@
-package kalmi;
-
-import jason.stdlib.foreach;
+package kalmi.AI;
 
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-
-import com.sun.management.VMOption.Origin;
+import kalmi.CommonTypes.Food;
 
 
 public class State {
-	public Map<Integer,Agent> agents = new HashMap<Integer,Agent>();
-	public List<Point> foods = new ArrayList<Point>();
+	
+	final int numOfAgents = 5;
+	
+	public Agent[] agents = new Agent[numOfAgents];
+	public List<Food> foods = new ArrayList<Food>();
 	
 	public StringBuffer debugInfo = new StringBuffer();
 	
@@ -21,18 +19,17 @@ public class State {
 	
 	public State(State s){
 		debugInfo.append(s.debugInfo);
-		for (Point food : s.foods) {
-			foods.add((Point) food.clone());
+		for (Food food : s.foods) {
+			foods.add(new Food(food));
 		}
 		
-		for (Integer x : s.agents.keySet()) {
-			Agent original = s.agents.get(x); 
+		for (Agent original : s.agents) {
 			Agent agent = new Agent();
 			agent.direction = original.direction;
 			agent.position = (Point) original.position.clone();
 			agent.id = original.id;
 			agent.claustrofobicness = original.claustrofobicness;
-			agents.put(x, agent);
+			agents[original.id] = agent;
 		}
 	}
 }

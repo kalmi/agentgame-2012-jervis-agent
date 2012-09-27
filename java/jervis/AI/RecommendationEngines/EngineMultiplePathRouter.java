@@ -1,10 +1,15 @@
-package kalmi;
+package kalmi.AI.RecommendationEngines;
 
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+
+import kalmi.AI.Agent;
+import kalmi.AI.State;
+import kalmi.CommonTypes.MyDir;
+
 
 public class EngineMultiplePathRouter implements RecommendationEngine {
 
@@ -33,47 +38,7 @@ public class EngineMultiplePathRouter implements RecommendationEngine {
 		
 		add(new ArrayList<Point>(){{
 			add(new Point(30,30));
-			/*add(new Point(25,-1));
-			add(new Point(-1,35));
-			add(new Point(35,-1));
-			add(new Point(-1,25));*/
 		}});
-		
-		/*
-		add(new ArrayList<Point>(){{
-			add(new Point(-1,10));
-			add(new Point(49,-1));
-			add(new Point(-1,49));
-			add(new Point(10,-1));
-		}});
-		
-		add(new ArrayList<Point>(){{
-			add(new Point(-1,10+2));
-			add(new Point(49-2,-1));
-			add(new Point(-1,49-2));
-			add(new Point(10+2,-1));
-		}});
-		
-		add(new ArrayList<Point>(){{
-			add(new Point(-1,10+4));
-			add(new Point(49-4,-1));
-			add(new Point(-1,49-4));
-			add(new Point(10+4,-1));
-		}});
-		
-		add(new ArrayList<Point>(){{
-			add(new Point(-1,10+7));
-			add(new Point(49-7,-1));
-			add(new Point(-1,49-7));
-			add(new Point(10+7,-1));
-		}});
-		
-		add(new ArrayList<Point>(){{
-			add(new Point(-1,10+10));
-			add(new Point(49-10,-1));
-			add(new Point(-1,49-7));
-			add(new Point(10+10,-1));
-		}});*/
 		
 	}};
 	
@@ -84,11 +49,11 @@ public class EngineMultiplePathRouter implements RecommendationEngine {
 	public Set<MyDir> getRecommendation(State state, int myId) {
 		EnumSet<MyDir> result = EnumSet.noneOf(MyDir.class);
 		
-		Agent agent = state.agents.get(myId);
+		Agent agent = state.agents[myId];
 		int x = agent.position.x;
 		int y = agent.position.y;
 		
-		ArrayList<Point> waypoints = waypointsPerAgent.get(myId-1);
+		ArrayList<Point> waypoints = waypointsPerAgent.get(myId);
 		Point waypoint = waypoints.get(currentWaypoint);
 		
 		if(waypoint.x==-1){

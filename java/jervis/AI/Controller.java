@@ -1,12 +1,17 @@
-package kalmi;
+package kalmi.AI;
 
 import java.awt.Point;
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-import kalmi.Command.Action;
+import kalmi.AI.Debug.DebugFrame2;
+import kalmi.AI.RecommendationEngines.EngineBevarosPathRouter;
+import kalmi.AI.RecommendationEngines.RecommendationEngine;
+import kalmi.CommonTypes.Food;
+import kalmi.CommonTypes.MyDir;
+import kalmi.CommonTypes.Perception;
+import kalmi.JasonLayer.Commands.*;
 
 
 
@@ -19,27 +24,23 @@ public class Controller {
 	
 	int forgasHack = 0;
 	
-	public Command process(int internalId, Point mypos, MyDir mydir, ArrayList<Point> visibleFoods) {
+	public Command process(Perception perception) {		
+		
+		int internalId = perception.internalId; 
+		Point mypos = perception.mypos;
+		MyDir mydir = perception.mydir;
+		List<Food> visibleFoods = perception.visibleFoods;
+		
 		
 		state.debugInfo = new StringBuffer();
 		
-		List<Point> foods = state.foods;
-		for (int i=foods.size()-1;i>=0;i--){
-			Point food = foods.get(i);
-			if(Utils.isVisible(mypos, mydir, foods.get(i)) && !visibleFoods.contains(food))
-		    	foods.remove(i);
-		}
-				
-		for (Point food : visibleFoods)
-			if(!foods.contains(food))
-				foods.add(food);
+	
 		
-		
-		Agent agent = state.agents.get(internalId);
+		Agent agent = state.agents[internalId];
 		
 		if(agent == null){
 			agent = new Agent();
-			state.agents.put(internalId, agent);
+			state.agents[internalId] = agent;
 		}
 		
 		
@@ -53,7 +54,17 @@ public class Controller {
 		
 		if( agent.claustrofobicness > 0)
 			agent.claustrofobicness--;
-		
+
+		List<Food> foods = state.foods;
+		for (int i=foods.size()-1;i>=0;i--){
+			Point food = foods.get(i);
+			if(agent.canSee(foods.get(i)) && !visibleFoods.contains(food))
+		    	foods.remove(i);
+		}
+				
+		for (Food food : visibleFoods)
+			if(!foods.contains(food))
+				foods.add(food);		
 		
 		state.debugInfo.append("Agent #");
 		state.debugInfo.append(internalId);
@@ -85,9 +96,9 @@ public class Controller {
 		}
 		
 				
-		Command command = new Command();
+		Command command = new Wait();
 		if(onFood){
-			command = new Command(Action.eat, 0, 0);			
+			command = new Eat();		
 		} else {
 			state.debugInfo.append("  Recommendations:\n");
 			EnumSet<MyDir> recommendation = EnumSet.allOf(MyDir.class);
@@ -124,15 +135,15 @@ public class Controller {
 			if (currentBest != null){
 				if(agent.banTurn==0 && currentBest != mydir){
 					agent.direction = currentBest;
-					command = new Command(Action.turn, currentBest.ordinal(), 0);
+					command = new Turn(currentBest);
 					agent.banTurn = 0;
 				}else{
-					command = new Command(Action.step, currentBest.ordinal(), 0);
+					command = new Move(currentBest);
 				}
 			}
 			else{
 				if(forgasHack!=0){
-					command = new Command(Action.turn, (mydir.ordinal()+1)%4,0);
+					command = new Turn(mydir.cwNext());
 					forgasHack--;
 				}
 				
@@ -160,6 +171,4 @@ public class Controller {
 		
 		return command;
 	}
-	
-	
 }

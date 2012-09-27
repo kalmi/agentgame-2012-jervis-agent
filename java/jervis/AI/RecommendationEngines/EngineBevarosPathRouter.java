@@ -1,10 +1,15 @@
-package kalmi;
+package kalmi.AI.RecommendationEngines;
 
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+
+import kalmi.AI.Agent;
+import kalmi.AI.State;
+import kalmi.CommonTypes.MyDir;
+
 
 public class EngineBevarosPathRouter implements RecommendationEngine {
 
@@ -65,7 +70,7 @@ public class EngineBevarosPathRouter implements RecommendationEngine {
 		
 		EnumSet<MyDir> result = EnumSet.noneOf(MyDir.class);
 		
-		Agent agent = state.agents.get(myId);
+		Agent agent = state.agents[myId];
 		int x = agent.position.x;
 		int y = agent.position.y;
 		

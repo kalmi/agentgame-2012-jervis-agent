@@ -1,12 +1,17 @@
-package kalmi;
+package kalmi.AI.RecommendationEngines;
 
 import java.util.EnumSet;
 import java.util.Set;
 
+import kalmi.AI.Agent;
+import kalmi.AI.State;
+import kalmi.CommonTypes.MyDir;
+
+
 public class EngineWallDisliker implements RecommendationEngine {
 
 	public Set<MyDir> getRecommendation(State state, int myId) {
-		Agent agent = state.agents.get(myId);
+		Agent agent = state.agents[myId];
 		EnumSet<MyDir> result = EnumSet.noneOf(MyDir.class);
 		
 		int x = agent.position.x;

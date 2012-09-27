@@ -1,11 +1,15 @@
-package kalmi;
+package kalmi.AI.RecommendationEngines;
 
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
+
+import kalmi.AI.Agent;
+import kalmi.AI.State;
+import kalmi.CommonTypes.MyDir;
+
 
 public class EngineStupidClaustrofobicRouter implements RecommendationEngine {
 
@@ -30,7 +34,7 @@ public class EngineStupidClaustrofobicRouter implements RecommendationEngine {
 	public Set<MyDir> getRecommendation(State state, int myId) {
 		EnumSet<MyDir> result = EnumSet.noneOf(MyDir.class);
 		
-		Agent agent = state.agents.get(myId);
+		Agent agent = state.agents[myId];
 		int x = agent.position.x;
 		int y = agent.position.y;
 		
@@ -38,9 +42,9 @@ public class EngineStupidClaustrofobicRouter implements RecommendationEngine {
 		
 		
 		if(agent.claustrofobicness == 0){
-			for (Entry<Integer, Agent> entry : state.agents.entrySet()) {
-				if(entry.getKey() == agent.id) continue;
-				Agent friendly = entry.getValue();
+			for (Agent otherAgent : state.agents) {
+				if(otherAgent == agent) continue;
+				Agent friendly = otherAgent;
 				Point friendlyPos = friendly.position;
 				if(friendlyPos.distance(agent.position)<15 && friendly.claustrofobicness == 0){
 					Point target = referenceWaypoints.get(currentWaypoint);

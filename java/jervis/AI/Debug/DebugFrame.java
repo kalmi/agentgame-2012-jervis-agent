@@ -8,14 +8,13 @@
 *******************************************************************************/
 
 
-package kalmi;
+package kalmi.AI.Debug;
 
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.TextArea;
 import java.util.ArrayList;
-import jason.asSemantics.TransitionSystem;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.ChangeEvent;

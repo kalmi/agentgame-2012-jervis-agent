@@ -1,6 +1,6 @@
-package kalmi;
+package kalmi.JasonLayer;
 
-enum LiteralType {
+public enum LiteralType {
 	food,
 	myteamtimeleft,
 	myenergy,

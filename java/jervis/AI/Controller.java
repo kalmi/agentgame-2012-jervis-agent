@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import jervis.AI.Debug.DebugFrame2;
+import jervis.AI.Debug.DebugToggle;
 import jervis.AI.RecommendationEngines.EngineBevarosPathRouter;
 import jervis.AI.RecommendationEngines.RecommendationEngine;
 import jervis.CommonTypes.Food;
@@ -19,11 +20,17 @@ import jervis.JasonLayer.Commands.*;
 
 public class Controller {
 	
-	DebugFrame2 debugFrame = new DebugFrame2();
-
+	DebugFrame2 debugFrame;
+	
 	State state = new State();
 	
 	int forgasHack = 0;
+	
+	public Controller(){
+		if(DebugToggle.ENABLED){
+			debugFrame = new DebugFrame2();
+		}
+	}
 	
 	public Command process(Perception perception) {		
 		
@@ -32,9 +39,9 @@ public class Controller {
 		MyDir mydir = perception.mydir;
 		List<Food> visibleFoods = perception.visibleFoods;
 		
-		
-		state.debugInfo = new StringBuffer();
-		
+		if(DebugToggle.ENABLED){
+			state.debugInfo = new StringBuffer();
+		}
 	
 		
 		Agent agent = state.agents[internalId];
@@ -67,22 +74,24 @@ public class Controller {
 			if(!foods.contains(food))
 				foods.add(food);		
 		
-		state.debugInfo.append("Agent #");
-		state.debugInfo.append(internalId);
-		state.debugInfo.append("\n");
-		state.debugInfo.append("  Pos: ");
-		state.debugInfo.append(mypos.x);
-		state.debugInfo.append(",");
-		state.debugInfo.append(mypos.y);
-		state.debugInfo.append("\n");
-		state.debugInfo.append("  Dir: ");
-		state.debugInfo.append(mydir.name());
-		state.debugInfo.append("(");
-		state.debugInfo.append(mydir.ordinal());
-		state.debugInfo.append(")\n");
-		state.debugInfo.append("  Clau: ");
-		state.debugInfo.append(agent.claustrofobicness);
-		state.debugInfo.append("\n");
+		if(DebugToggle.ENABLED){
+			state.debugInfo.append("Agent #");
+			state.debugInfo.append(internalId);
+			state.debugInfo.append("\n");
+			state.debugInfo.append("  Pos: ");
+			state.debugInfo.append(mypos.x);
+			state.debugInfo.append(",");
+			state.debugInfo.append(mypos.y);
+			state.debugInfo.append("\n");
+			state.debugInfo.append("  Dir: ");
+			state.debugInfo.append(mydir.name());
+			state.debugInfo.append("(");
+			state.debugInfo.append(mydir.ordinal());
+			state.debugInfo.append(")\n");
+			state.debugInfo.append("  Clau: ");
+			state.debugInfo.append(agent.claustrofobicness);
+			state.debugInfo.append("\n");
+		}
 		
 		
 
@@ -109,22 +118,27 @@ public class Controller {
 				if(currentRecommendation.size() == 0)
 					continue;
 				else{
-					state.debugInfo.append("    ");
-					state.debugInfo.append(engine.getClass().getName());
-					state.debugInfo.append(": ");
-					
+					if(DebugToggle.ENABLED){
+						state.debugInfo.append("    ");
+						state.debugInfo.append(engine.getClass().getName());
+						state.debugInfo.append(": ");
+					}
 					
 					EnumSet<MyDir> newRecommendation = recommendation.clone();
 					newRecommendation.retainAll(currentRecommendation);
 					
-					state.debugInfo.append(newRecommendation.toString());
-					state.debugInfo.append("\n");
+					if(DebugToggle.ENABLED){
+						state.debugInfo.append(newRecommendation.toString());
+						state.debugInfo.append("\n");
+					}
 					
 					if(newRecommendation.size() > 0){
 						recommendation = newRecommendation;
 						currentBest = recommendation.iterator().next();
 						if(recommendation.size() == 1){
-							state.debugInfo.append("Only one recommendation → We are done here\n");
+							if(DebugToggle.ENABLED){
+								state.debugInfo.append("Only one recommendation → We are done here\n");
+							}
 							break;
 						}
 					}
@@ -152,23 +166,21 @@ public class Controller {
 			}
 		}
 		
-		state.debugInfo.append("Decision: ");
-		state.debugInfo.append(command.toString());
-		state.debugInfo.append("\n");
-		state.debugInfo.append("\n");
+		if(DebugToggle.ENABLED){
+			state.debugInfo.append("Decision: ");
+			state.debugInfo.append(command.toString());
+			state.debugInfo.append("\n");
+			state.debugInfo.append("\n");
+			
+			state.debugInfo.append("WAITER: ");
+			state.debugInfo.append(EngineBevarosPathRouter.waiter);
+			state.debugInfo.append("\n");
+			state.debugInfo.append("LAUNCH: ");
+			state.debugInfo.append(EngineBevarosPathRouter.launch);
+			state.debugInfo.append("\n");
 		
-		state.debugInfo.append("WAITER: ");
-		state.debugInfo.append(EngineBevarosPathRouter.waiter);
-		state.debugInfo.append("\n");
-		state.debugInfo.append("LAUNCH: ");
-		state.debugInfo.append(EngineBevarosPathRouter.launch);
-		state.debugInfo.append("\n");
-		
-		//debugFrame.add(new State(state));
-		
-		
-
-		
+			debugFrame.add(new State(state));
+		}
 		
 		return command;
 	}

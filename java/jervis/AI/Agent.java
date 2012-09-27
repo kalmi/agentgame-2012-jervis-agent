@@ -20,9 +20,9 @@ public class Agent {
 
 	@SuppressWarnings("serial")
 	List<RecommendationEngine> recommendationEngines = new ArrayList<RecommendationEngine>(){{
-		add(new EngineFoodLiker());
-		add(new EngineWallDisliker());
-		add(new EngineMultiplePathRouter());
+		//add(new EngineFoodLiker());
+		//add(new EngineWallDisliker());
+		//add(new EngineMultiplePathRouter());
 	}};
 	
     public Agent() {

@@ -67,6 +67,10 @@ public class EngineFoodLiker extends RecommendationEngine {
 		int closestDistance = Integer.MAX_VALUE;
 		for (Point food : state.foods) {
 			
+			if(state.enemyAgent != null)
+				if(state.enemyAgent.x == food.x && state.enemyAgent.y == food.y)
+					continue;
+			
 			if(!okForAgent(food, agent))
 				continue;
 			

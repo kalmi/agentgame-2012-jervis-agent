@@ -3,11 +3,9 @@ package jervis.AI;
 import jason.architecture.AgArch;
 import jason.asSemantics.ActionExec;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 import jervis.AI.Debug.DebugFrame2;
 import jervis.AI.Debug.DebugToggle;
+import jervis.AI.RecommendationEngines.Recommendation;
 import jervis.AI.RecommendationEngines.RecommendationEngine;
 import jervis.CommonTypes.MyDir;
 import jervis.CommonTypes.Perception;
@@ -35,6 +33,9 @@ public class Controller {
 
 		if(DebugToggle.ENABLED){
 			state.debugInfo = new StringBuffer();
+			state.debugInfo.append("Agent #");
+			state.debugInfo.append(p.internalId);
+			state.debugInfo.append("\n\n");
 		}
 		
 		Agent agent = state.getAgent(p.internalId);	
@@ -82,47 +83,53 @@ public class Controller {
 				state.debugInfo.append("  Recommendations:\n");
 			}
 			
-			EnumSet<MyDir> recommendation = EnumSet.allOf(MyDir.class);
-			MyDir currentBest = null;
+			int[] turnRecommendedness = new int[4];
+			int[] moveRecommendedness = new int[4];
+						
 			for (RecommendationEngine engine : me.recommendationEngines) {
-				Set<MyDir> currentRecommendation = engine.getRecommendation(state, me.id);
-				if(currentRecommendation.size() == 0)
-					continue;
-				else{
+				for (Recommendation r : engine.getRecommendation(state, me.id)) {
 					if(DebugToggle.ENABLED){
 						state.debugInfo.append("    ");
-						state.debugInfo.append(engine.getClass().getName());
-						state.debugInfo.append(": ");
-					}
-					
-					EnumSet<MyDir> newRecommendation = recommendation.clone();
-					newRecommendation.retainAll(currentRecommendation);
-					
-					if(DebugToggle.ENABLED){
-						state.debugInfo.append(newRecommendation.toString());
+						state.debugInfo.append(r.toString());
 						state.debugInfo.append("\n");
 					}
-					
-					if(newRecommendation.size() > 0){
-						recommendation = newRecommendation;
-						currentBest = recommendation.iterator().next();
-						if(recommendation.size() == 1){
-							if(DebugToggle.ENABLED){
-								state.debugInfo.append("Only one recommendation → We are done here\n");
-							}
-							break;
-						}
-					}
-				}				
+					if(r.recommendationType == Recommendation.RecommendationType.moveOrTurn){
+						//turnRecommendedness[r.dir.ordinal()] += r.strength;
+						moveRecommendedness[r.dir.ordinal()] += r.strength;
+					} else if(r.recommendationType == Recommendation.RecommendationType.turn){
+						turnRecommendedness[r.dir.ordinal()] += r.strength;
+					}	
+				}
 			}
 			
+			int highestMoveRecommendedness = 0;
+			MyDir moveDir = null;;
+			for (int i = 0; i < moveRecommendedness.length; i++) {
+				if(highestMoveRecommendedness < moveRecommendedness[i]){
+					highestMoveRecommendedness = moveRecommendedness[i];
+					moveDir = MyDir.fromInt(i);
+				}
+			}
 			
-			if (currentBest == null)
+			int highestTurnRecommendedness = 0;
+			MyDir turnDir = null;
+			for (int i = 0; i < turnRecommendedness.length; i++) {
+				if(highestTurnRecommendedness < turnRecommendedness[i]){
+					highestTurnRecommendedness = turnRecommendedness[i];
+					turnDir = MyDir.fromInt(i);
+				}
+			}
+			
+			boolean justTurn = ((highestMoveRecommendedness < highestTurnRecommendedness) /*&& turnDir != me.direction*/);
+			
+			if (highestMoveRecommendedness + highestTurnRecommendedness == 0)
 				return new Wait();
-			else if (currentBest != me.direction)			
-				return new Turn(currentBest);				
+			else if (justTurn)
+				return new Turn(turnDir);
+			else if (moveDir != me.direction)			
+				return new Turn(moveDir);				
 			else
-				return new Move(currentBest);		
+				return new Move(moveDir);		
 		}
 	}
 }

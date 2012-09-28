@@ -4,15 +4,18 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
-
 import jervis.AI.Agent;
 import jervis.AI.State;
+import jervis.AI.RecommendationEngines.Recommendation.RecommendationType;
 import jervis.CommonTypes.MyDir;
 
 
 
-public class EngineClassicalRouter implements RecommendationEngine {
+public class EngineClassicalRouter extends RecommendationEngine {
+
+	public EngineClassicalRouter(int strength) {
+		super(strength);
+	}
 
 	@SuppressWarnings("serial")
 	static final List<Point> waypoints = new ArrayList<Point>(){{
@@ -24,7 +27,7 @@ public class EngineClassicalRouter implements RecommendationEngine {
 	
 	int currentWaypoint = 0;
 	
-	public Set<MyDir> getRecommendation(State state, int myId) {
+	public List<Recommendation> getRecommendation(State state, int myId) {
 		EnumSet<MyDir> result = EnumSet.noneOf(MyDir.class);
 		
 		Agent agent = state.agents[myId];
@@ -51,9 +54,13 @@ public class EngineClassicalRouter implements RecommendationEngine {
 			currentWaypoint = (currentWaypoint + 1) % waypoints.size();
 			return getRecommendation(state, myId);
 		}
-			
 		
-		return result;
+		
+		List<Recommendation> r = new ArrayList<Recommendation>();
+		for (MyDir myDir : result) {
+			r.add(new Recommendation(strength,RecommendationType.moveOrTurn,myDir));
+		}
+		return r;
 			
 	}
 

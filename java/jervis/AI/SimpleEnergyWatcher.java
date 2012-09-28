@@ -20,10 +20,12 @@ public class SimpleEnergyWatcher {
 			int myCollectiveEnergy = Agent.getCollectiveEnergy(state.agents);
 			int otherTeamCollectiveEnergy = ((int)((double)myCollectiveEnergy/p.ratio)) - myCollectiveEnergy;
 			
+			Agent agent = state.getAgent(p.internalId);
+			
 			if(p.time > 2){
 				boolean simpleAteThisRound = (otherTeamCollectiveEnergy>otherTeamCollectiveEnergyLastRound+4);
 				if(simpleAteLastRound && !simpleAteThisRound){
-					state.last4Consumption.insert(p.time);					
+					state.last4Consumption.insert(agent.getInternalTime()-1);					
 				}
 				simpleAteLastRound = simpleAteThisRound;
 			}

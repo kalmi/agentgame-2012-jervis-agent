@@ -11,7 +11,7 @@ import jervis.AI.State;
 
 public abstract class Command {
 
-    protected enum Action {
+    public enum Action {
         step, turn, wait, eat, attack, transfer
     };
     

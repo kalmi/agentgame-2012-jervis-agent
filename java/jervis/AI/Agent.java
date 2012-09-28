@@ -21,14 +21,19 @@ public class Agent {
 	
 	@SuppressWarnings("serial")
 	List<RecommendationEngine> recommendationEngines = new ArrayList<RecommendationEngine>(){{
-		add(new EngineFoodLiker());
-		add(new EngineWallDisliker());
-		add(new EngineMultiplePathRouter());
+		add(new EngineFoodLiker(1000));
+		add(new EngineTurnOnEat(100));
+		add(new EngineWallDisliker(10));
+		add(new EngineMultiplePathRouter(1));		
 	}};
 	
     public Agent() {
 		// TODO Auto-generated constructor stub
 	}
+    
+    public int getInternalTime(){
+    	return time*6 + order;
+    }
 
     private boolean debugOutputtedThisRound;
     private void debug(String text){

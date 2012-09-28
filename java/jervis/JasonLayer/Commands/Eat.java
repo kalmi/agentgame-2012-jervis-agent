@@ -29,7 +29,7 @@ public class Eat extends Command {
 		if(agent.onFood.value <= 0){
 			agent.onFood = null;
 			state.foods.remove(food);
-			state.last4Consumption.insert(agent.time);
+			state.last4Consumption.insert(agent.getInternalTime());
 		}
 		
 	}

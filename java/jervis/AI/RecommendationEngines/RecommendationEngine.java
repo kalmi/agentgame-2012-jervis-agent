@@ -1,12 +1,14 @@
 package jervis.AI.RecommendationEngines;
 
-import java.util.Set;
-
+import java.util.List;
 import jervis.AI.State;
-import jervis.CommonTypes.MyDir;
 
 
-
-public interface RecommendationEngine {
-	public Set<MyDir> getRecommendation(State state, int myId);
+public abstract class  RecommendationEngine {
+	public abstract List<Recommendation> getRecommendation(State state, int myId);
+	
+	protected int strength;
+	public RecommendationEngine(int strength){
+		this.strength = strength;
+	}
 }

@@ -1,15 +1,14 @@
 package jervis.AI;
 
-import java.awt.Point;
+import jason.architecture.AgArch;
+import jason.asSemantics.ActionExec;
+
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Set;
 
 import jervis.AI.Debug.DebugFrame2;
 import jervis.AI.Debug.DebugToggle;
-import jervis.AI.RecommendationEngines.EngineBevarosPathRouter;
 import jervis.AI.RecommendationEngines.RecommendationEngine;
-import jervis.CommonTypes.Food;
 import jervis.CommonTypes.MyDir;
 import jervis.CommonTypes.Perception;
 import jervis.JasonLayer.Commands.*;
@@ -32,89 +31,60 @@ public class Controller {
 		}
 	}
 	
-	public Command process(Perception perception) {		
-		
-		int internalId = perception.internalId; 
-		Point mypos = perception.mypos;
-		MyDir mydir = perception.mydir;
-		List<Food> visibleFoods = perception.visibleFoods;
-		
+	public Command process(Perception p, AgArch agArch) {		
+
 		if(DebugToggle.ENABLED){
 			state.debugInfo = new StringBuffer();
 		}
-	
 		
-		Agent agent = state.agents[internalId];
+		Agent agent = state.getAgent(p.internalId);
 		
-		if(agent == null){
-			agent = new Agent();
-			state.agents[internalId] = agent;
-		}
-		
-		
-		
-		agent.direction = mydir;
-		agent.position = mypos;
-		agent.id = internalId;
-		
-		if( agent.banTurn > 0)
-			agent.banTurn--;
-		
-		if( agent.claustrofobicness > 0)
-			agent.claustrofobicness--;
+		agent.update(p);		
+		state.processVisibleFoods(agent, p);
+		state.processEnemyAgents(agent, p);
 
-		List<Food> foods = state.foods;
-		for (int i=foods.size()-1;i>=0;i--){
-			Point food = foods.get(i);
-			if(agent.canSee(foods.get(i)) && !visibleFoods.contains(food))
-		    	foods.remove(i);
+		Command command = determineAppropiateCommandFor(agent);
+		
+		ActionExec action = command.toAction();
+		agArch.act(action, null);
+		
+		if(action.getResult() == true){
+			command.pretend(agent, state);
+		} else {
+			System.out.println( command.toString() + " failed." );
 		}
-				
-		for (Food food : visibleFoods)
-			if(!foods.contains(food))
-				foods.add(food);		
+		
+		
+		
+		
+		
 		
 		if(DebugToggle.ENABLED){
-			state.debugInfo.append("Agent #");
-			state.debugInfo.append(internalId);
+			state.debugInfo.append("Decision: ");
+			state.debugInfo.append(command.toString());
 			state.debugInfo.append("\n");
-			state.debugInfo.append("  Pos: ");
-			state.debugInfo.append(mypos.x);
-			state.debugInfo.append(",");
-			state.debugInfo.append(mypos.y);
 			state.debugInfo.append("\n");
-			state.debugInfo.append("  Dir: ");
-			state.debugInfo.append(mydir.name());
-			state.debugInfo.append("(");
-			state.debugInfo.append(mydir.ordinal());
-			state.debugInfo.append(")\n");
-			state.debugInfo.append("  Clau: ");
-			state.debugInfo.append(agent.claustrofobicness);
-			state.debugInfo.append("\n");
+	
+			debugFrame.add(new State(state));
 		}
 		
 		
+		
+		return command;
+	}
 
-		
-		boolean onFood = false;
-		for (Point food : foods) {
-			if(food.equals(mypos)){
-				onFood = true;
-				forgasHack = 3*3; //TODO: Csak akkor forogni, ha tényleg elfogy.
-				break;
-			}
-		}
-		
-				
-		Command command = new Wait();
-		if(onFood){
-			command = new Eat();		
+	private Command determineAppropiateCommandFor(Agent me) {
+		if(me.onFood != null){
+			return new Eat();		
 		} else {
-			state.debugInfo.append("  Recommendations:\n");
+			if(DebugToggle.ENABLED){
+				state.debugInfo.append("  Recommendations:\n");
+			}
+			
 			EnumSet<MyDir> recommendation = EnumSet.allOf(MyDir.class);
 			MyDir currentBest = null;
-			for (RecommendationEngine engine : agent.recommendationEngines) {
-				Set<MyDir> currentRecommendation = engine.getRecommendation(state, internalId);
+			for (RecommendationEngine engine : me.recommendationEngines) {
+				Set<MyDir> currentRecommendation = engine.getRecommendation(state, me.id);
 				if(currentRecommendation.size() == 0)
 					continue;
 				else{
@@ -142,46 +112,16 @@ public class Controller {
 							break;
 						}
 					}
-				}
-				
+				}				
 			}
 			
 			
-			if (currentBest != null){
-				if(agent.banTurn==0 && currentBest != mydir){
-					agent.direction = currentBest;
-					command = new Turn(currentBest);
-					agent.banTurn = 0;
-				}else{
-					command = new Move(currentBest);
-				}
-			}
-			else{
-				if(forgasHack!=0){
-					command = new Turn(mydir.cwNext());
-					forgasHack--;
-				}
-				
-				
-			}
+			if (currentBest == null)
+				return new Wait();
+			else if (currentBest != me.direction)			
+				return new Turn(currentBest);				
+			else
+				return new Move(currentBest);		
 		}
-		
-		if(DebugToggle.ENABLED){
-			state.debugInfo.append("Decision: ");
-			state.debugInfo.append(command.toString());
-			state.debugInfo.append("\n");
-			state.debugInfo.append("\n");
-			
-			state.debugInfo.append("WAITER: ");
-			state.debugInfo.append(EngineBevarosPathRouter.waiter);
-			state.debugInfo.append("\n");
-			state.debugInfo.append("LAUNCH: ");
-			state.debugInfo.append(EngineBevarosPathRouter.launch);
-			state.debugInfo.append("\n");
-		
-			debugFrame.add(new State(state));
-		}
-		
-		return command;
 	}
 }

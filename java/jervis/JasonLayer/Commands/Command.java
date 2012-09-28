@@ -6,6 +6,8 @@ import jason.asSemantics.ActionExec;
 import jason.asSemantics.Intention;
 import jason.asSyntax.ASSyntax;
 import jason.asSyntax.LiteralImpl;
+import jervis.AI.Agent;
+import jervis.AI.State;
 
 public abstract class Command {
 
@@ -28,4 +30,6 @@ public abstract class Command {
 		}
 		return action;
     }
+
+	public abstract void pretend(Agent agent, State state);
 }

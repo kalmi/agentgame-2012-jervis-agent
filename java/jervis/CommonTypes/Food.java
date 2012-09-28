@@ -5,7 +5,7 @@ import java.awt.Point;
 @SuppressWarnings("serial")
 public class Food extends Point {
 	
-	int value = -1; 
+	public int value = -1; 
 	
 	public Food() {
 		

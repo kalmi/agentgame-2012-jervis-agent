@@ -9,17 +9,13 @@ import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 import jervis.CommonTypes.Food;
 import jervis.CommonTypes.MyDir;
-import jervis.CommonTypes.PerceptedAgent;
+import jervis.CommonTypes.PerceivedAgent;
 
 public class BeliefParser {
 	
 	public static int parseNameAndGetId(Literal item){
 		String myname_str = item.getTerm(0).toString();
-		if(myname_str == "jervis_"){
-			return 0;
-		} else {
-			return myname_str.charAt(myname_str.length()-1) - '0' - 1;
-		}
+		return (myname_str == "jervis_")? 0: myname_str.charAt(myname_str.length()-1) - '0' - 1;
 	}	
 	
 	public static Point parseMyPos(Literal item) {
@@ -33,7 +29,7 @@ public class BeliefParser {
 	}
 	
 	public static List<Food> parseFoods(Literal literal){
-		List<Food> foods = new ArrayList<Food>();
+		ArrayList<Food> foods = new ArrayList<Food>();
 		ListTerm listTerm = (ListTerm) literal.getTerm(0);
 		for (Term term : listTerm.getAsList()) {
 			ListTerm tmp = (ListTerm)term;
@@ -56,8 +52,8 @@ public class BeliefParser {
 
 	//        0 1  2 3 4 5 6
 	//agent([[D,Id,T,E,X,Y,O],...])
-	public static List<PerceptedAgent> parseAgents(Literal literal){
-		List<PerceptedAgent> agents = new ArrayList<PerceptedAgent>();
+	public static List<PerceivedAgent> parseAgents(Literal literal){
+		List<PerceivedAgent> agents = new ArrayList<PerceivedAgent>();
 		ListTerm listTerm = (ListTerm) literal.getTerm(0);
 		for (Term term : listTerm.getAsList()) {
 			ListTerm tmp = (ListTerm)term;
@@ -80,7 +76,7 @@ public class BeliefParser {
 			String dir_str = tmp.get(6).toString();
 			MyDir dir = MyDir.fromInt(Integer.parseInt(dir_str));;
 			
-			PerceptedAgent agent = new PerceptedAgent(id, x, y, dir, energy, teamId);
+			PerceivedAgent agent = new PerceivedAgent(id, x, y, dir, energy, teamId);
 			agents.add(agent);
 		}
 		return agents;
@@ -89,6 +85,19 @@ public class BeliefParser {
 	
 	public static double parseMyTeamRatio(Literal item) {
 		return Double.parseDouble(item.getTerm(0).toString()); 
+	}
+
+	public static int parseMyEnergy(Literal item) {
+		return Integer.parseInt(item.getTerm(0).toString()); 
+		
+	}
+
+	public static int parseTime(Literal item) {
+		return Integer.parseInt(item.getTerm(0).toString()); 
+	}
+
+	public static int parseMyTeam(Literal item) {
+		return Integer.parseInt(item.getTerm(0).toString()); 
 	}
 
 	

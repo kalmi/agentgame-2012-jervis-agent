@@ -20,11 +20,8 @@ public class main extends DefaultInternalAction{
 		Agent agent = ts.getAg();		
 		Perception perception = new Perception(agent.getBB());
 		
-		Command command  = controller.process(perception);
-		
-		ActionExec action = command.toAction();
-		ts.getUserAgArch().act(action, null);
-		
+		controller.process(perception, ts.getUserAgArch());
+
 		return true;
 	}
 }

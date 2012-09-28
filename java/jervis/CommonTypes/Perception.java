@@ -15,8 +15,11 @@ public class Perception {
 	public final Point mypos;
 	public final MyDir mydir;
 	public final List<Food> visibleFoods;
-	public final List<PerceptedAgent> visibleAgents;
+	public final List<PerceivedAgent> visibleAgents;
 	public final double ratio;
+	public final int myenergy;
+	public final int myteam;
+	public final int time;
 	 
 	
 	public Perception(BeliefBase bb) {
@@ -25,8 +28,11 @@ public class Perception {
 		Point mypos = null;
 		MyDir mydir = null;
 		List<Food> visibleFoods = null;
-		List<PerceptedAgent> visibleAgents = null;
+		List<PerceivedAgent> visibleAgents = null;
 		Double ratio = null;
+		Integer myenergy = null;
+		Integer myTeamId = null;
+		Integer time = null;
 		
 		Iterator<Literal> iter = bb.iterator();
 		while (iter.hasNext()) {
@@ -46,6 +52,10 @@ public class Perception {
 			case mydir:
 				mydir = BeliefParser.parseMyDir(item);
 				break;
+
+			case myenergy:
+				myenergy = BeliefParser.parseMyEnergy(item);
+				break;				
 				
 			case food:
 				visibleFoods = BeliefParser.parseFoods(item);
@@ -55,8 +65,17 @@ public class Perception {
 				visibleAgents = BeliefParser.parseAgents(item);
 				break;
 
+			case myteam:
+				myTeamId = BeliefParser.parseMyTeam(item);
+				break;				
+				
 			case myteamratio:
 				ratio = BeliefParser.parseMyTeamRatio(item);
+				break;
+				
+			case time:
+				time = BeliefParser.parseTime(item);
+				break;				
 				
 			default:
 				break;
@@ -69,6 +88,10 @@ public class Perception {
 		this.visibleFoods = visibleFoods;
 		this.visibleAgents = visibleAgents;
 		this.ratio = ratio;
+		this.myenergy = myenergy;
+		this.myteam = myTeamId;
+		this.time = time;
+		
 		
 
 	}

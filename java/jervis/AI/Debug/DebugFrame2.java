@@ -181,7 +181,7 @@ public class DebugFrame2 extends JFrame implements ChangeListener{
 					return state.agents[key].position.y;
 				}
 				else if(columnIndex == 4){
-					return state.agents[key].claustrofobicness;
+					return state.agents[key].energy;
 				}
 				return "ERROR";
 				

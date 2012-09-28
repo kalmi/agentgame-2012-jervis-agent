@@ -3,13 +3,13 @@ package jervis.CommonTypes;
 import java.awt.Point;
 
 @SuppressWarnings("serial")
-public class PerceptedAgent extends Point {
-	final int energy;
-	final MyDir dir;
-	final byte teamId;
-	final byte id;
+public class PerceivedAgent extends Point {
+	public final int energy;
+	public final MyDir dir;
+	public final byte teamId;
+	public final byte id;
 	
-	public PerceptedAgent(PerceptedAgent other) {
+	public PerceivedAgent(PerceivedAgent other) {
 		super(other);
 		id = other.id;
 		dir = other.dir;
@@ -19,7 +19,7 @@ public class PerceptedAgent extends Point {
 		
 	}
 
-	public PerceptedAgent(byte id, int x, int y, MyDir dir, int energy, byte teamId) {
+	public PerceivedAgent(byte id, int x, int y, MyDir dir, int energy, byte teamId) {
 		super(x, y);
 		this.dir = dir;
 		this.energy = energy;

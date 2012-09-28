@@ -11,7 +11,8 @@ import jervis.CommonTypes.Perception;
 
 
 public class Agent {
-    public int id;
+    public int id = -1;
+    public int order;
     public Point position;
     public MyDir direction;
 	public int energy = 4000;
@@ -38,11 +39,21 @@ public class Agent {
     
     public void update(Perception p){
     	debugOutputtedThisRound = false;
+    	time = p.time;
     	
     	if(p.internalId != id){
-			System.out.println("All systems online.");
-			id = p.internalId;
+    		id = p.internalId;
+			debug("- Test complete. Preparing to power down and begin diagnostics..."); 
+			debug("- Uh, yeah, tell you what. Do a weather and ATC check, start listening in on ground control."); 
+			debug("- Sir, there are still terabytes of calculations required before an actual flight is..."); 
+			debug("- Jarvis... sometimes you gotta run before you can walk.");
 		}
+    	
+    	if(p.jasonId!=order){
+    		order = p.jasonId;
+    		debug("- Sir, I am number " + Integer.toString(order) + " in order.");
+    	}
+    	
     	
 		if(!p.mypos.equals(position)){
 			debug(" - Sir, it appears that we are losing altitude. Adjusting...");
@@ -127,4 +138,13 @@ public class Agent {
 		s.append(")\n");
 		return s.toString();
     }
+
+
+	public static int getCollectiveEnergy(Agent[] agents) {
+		int energy = 0;
+		for (Agent agent : agents) {
+			energy += agent.energy;
+		}
+		return energy;
+	}
 }

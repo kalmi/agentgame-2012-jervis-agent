@@ -4,7 +4,6 @@ import jason.asSemantics.*;
 import jason.asSyntax.*;
 import jervis.AI.Controller;
 import jervis.CommonTypes.Perception;
-import jervis.JasonLayer.Commands.Command;
 
 
 public class main extends DefaultInternalAction{

@@ -20,6 +20,7 @@ public class Perception {
 	public final int myenergy;
 	public final int myteam;
 	public final int time;
+	public final int jasonId;
 	 
 	
 	public Perception(BeliefBase bb) {
@@ -33,6 +34,7 @@ public class Perception {
 		Integer myenergy = null;
 		Integer myTeamId = null;
 		Integer time = null;
+		Integer jasonId = null;
 		
 		Iterator<Literal> iter = bb.iterator();
 		while (iter.hasNext()) {
@@ -40,6 +42,11 @@ public class Perception {
 			LiteralType type = LiteralType.valueOf(item.getFunctor());
 			
 			switch (type) {
+			
+			case myid:
+				jasonId = BeliefParser.parseJasonId(item);
+				break;
+				
 			
 			case myname:
 				internalId = BeliefParser.parseNameAndGetId(item);
@@ -82,6 +89,7 @@ public class Perception {
 			}
 		}
 		
+		this.jasonId = jasonId;
 		this.internalId = internalId;
 		this.mypos = mypos;
 		this.mydir = mydir;

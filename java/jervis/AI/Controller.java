@@ -37,11 +37,12 @@ public class Controller {
 			state.debugInfo = new StringBuffer();
 		}
 		
-		Agent agent = state.getAgent(p.internalId);
-		
+		Agent agent = state.getAgent(p.internalId);	
 		agent.update(p);		
 		state.processVisibleFoods(agent, p);
 		state.processEnemyAgents(agent, p);
+		
+		SimpleEnergyWatcher.run(p, state);
 
 		Command command = determineAppropiateCommandFor(agent);
 		

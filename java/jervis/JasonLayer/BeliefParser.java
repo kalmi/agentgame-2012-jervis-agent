@@ -100,6 +100,10 @@ public class BeliefParser {
 		return Integer.parseInt(item.getTerm(0).toString()); 
 	}
 
+	public static int parseJasonId(Literal item) {
+		return Integer.parseInt(item.getTerm(0).toString());
+	}
+
 	
 
 

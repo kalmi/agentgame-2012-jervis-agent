@@ -5,19 +5,16 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
+
 import jervis.AI.Agent;
 import jervis.AI.State;
-import jervis.AI.RecommendationEngines.Recommendation.RecommendationType;
 import jervis.CommonTypes.MyDir;
 
 
 
 
-public class EngineFoodLiker extends RecommendationEngine {
-
-	public EngineFoodLiker(int strength) {
-		super(strength);
-	}
+public class EngineFoodLiker implements RecommendationEngine {
 
 		@SuppressWarnings("serial")
 		List<Rectangle> boundPerAgent = new ArrayList<Rectangle>(){{
@@ -47,10 +44,10 @@ public class EngineFoodLiker extends RecommendationEngine {
 		//return true;
 	} 
 		
-	public List<Recommendation> getRecommendation(State state, int myId) {
+	public Set<MyDir> getRecommendation(State state, int myId) {
 		EnumSet<MyDir> result = EnumSet.noneOf(MyDir.class);
 		if(state.foods.size() == 0)
-			return new ArrayList<Recommendation>();
+			return result;
 		
 		Agent agent = state.agents[myId];
 		
@@ -91,8 +88,7 @@ public class EngineFoodLiker extends RecommendationEngine {
 			}
 		}
 		
-		if(closestFood == null)
-			return new ArrayList<Recommendation>();
+		if(closestFood == null) return result;
 		
 		if(agent.position.x > closestFood.x)
 			result.add(MyDir.left);
@@ -104,11 +100,8 @@ public class EngineFoodLiker extends RecommendationEngine {
 		else if (agent.position.y > closestFood.y)
 			result.add(MyDir.up);
 		
-		List<Recommendation> r = new ArrayList<Recommendation>();
-		for (MyDir myDir : result) {
-			r.add(new Recommendation(strength,RecommendationType.moveOrTurn,myDir));
-		}
-		return r;
+		return result;
+			
 	}
 
 }

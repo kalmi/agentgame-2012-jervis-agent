@@ -2,8 +2,9 @@ package jervis.JasonLayer;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
@@ -12,10 +13,18 @@ import jervis.CommonTypes.MyDir;
 import jervis.CommonTypes.PerceivedAgent;
 
 public class BeliefParser {
+	static Map<String, Integer> mapping = new HashMap<String, Integer>();
+	static Integer largestId = -1;
 	
 	public static int parseNameAndGetId(Literal item){
 		String myname_str = item.getTerm(0).toString();
-		return (myname_str == "jervis_")? 0: myname_str.charAt(myname_str.length()-1) - '0' - 1;
+		if(mapping.containsKey(myname_str)){
+			return mapping.get(myname_str);
+		}else{
+			largestId++;
+			mapping.put(myname_str, largestId);
+			return largestId;
+		}
 	}	
 	
 	public static Point parseMyPos(Literal item) {

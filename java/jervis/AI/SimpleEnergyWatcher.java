@@ -20,8 +20,12 @@ public class SimpleEnergyWatcher {
 				
 				if(p.time > 2){
 					boolean simpleAteThisRound = (otherTeamCollectiveEnergy>otherTeamCollectiveEnergyLastRound+6);
+					
+					if(simpleAteThisRound) Stat.logSimpleEat();
+					
 					if(simpleAteLastRound && !simpleAteThisRound){
-						state.last4Consumption.insert(agent.getInternalTime()-1);					
+						state.last4Consumption.insert(agent.getInternalTime()-1);
+						Stat.logSimpleEatFinished();
 					}
 					simpleAteLastRound = simpleAteThisRound;
 					

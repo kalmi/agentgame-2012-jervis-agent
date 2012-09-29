@@ -1,6 +1,7 @@
 package jervis.JasonLayer.Commands;
 
 import jervis.AI.Agent;
+import jervis.AI.Stat;
 import jervis.AI.State;
 import jervis.CommonTypes.Food;
 
@@ -30,6 +31,7 @@ public class Eat extends Command {
 			agent.onFood = null;
 			state.foods.remove(food);
 			state.last4Consumption.insert(agent.getInternalTime());
+			Stat.logEatFinshed(agent);
 		}
 		
 	}

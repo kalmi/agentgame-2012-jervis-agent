@@ -32,14 +32,14 @@ public class Controller {
 	private Random random = new Random();
 	
 	public Controller(){
-		if(DebugToggle.ENABLED){
+		if(DebugToggle.GUIENABLED){
 			debugFrame = new DebugFrame2();
 		}
 	}
 	
-	public Command process(Perception p, AgArch agArch) {		
+	public void process(Perception p, AgArch agArch) {		
 
-		if(DebugToggle.ENABLED){
+		if(DebugToggle.GUIENABLED){
 			state.debugInfo = new StringBuffer();
 			state.debugInfo.append("Agent #");
 			state.debugInfo.append(p.internalId);
@@ -77,7 +77,7 @@ public class Controller {
 		
 		
 		
-		if(DebugToggle.ENABLED){
+		if(DebugToggle.GUIENABLED){
 			state.debugInfo.append("Decision: ");
 			state.debugInfo.append(command.toString());
 			state.debugInfo.append("\n");
@@ -86,9 +86,15 @@ public class Controller {
 			debugFrame.add(new State(state));
 		}
 		
+		Stat.logCommand(agent, command);
 		
+		if(agent.order >= 4 && p.time == 14999){
+			for (String line: Stat.getSummary().split("\n")) {
+				System.out.println(line);
+			}
+			
+		}
 		
-		return command;
 	}
 
 	private Command determineAppropiateCommandFor(Agent me) {

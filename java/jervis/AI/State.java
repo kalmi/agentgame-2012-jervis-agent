@@ -76,6 +76,7 @@ public class State {
 			for (PerceivedAgent otherAgent : p.visibleAgents) {
 				if(otherAgent.teamId != p.myteam){
 					enemyAgent = otherAgent;
+					Stat.logSimpleSeen();
 				}
 			}
 		}

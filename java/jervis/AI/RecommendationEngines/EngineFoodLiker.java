@@ -119,7 +119,7 @@ public class EngineFoodLiker extends RecommendationEngine {
 		
 		List<Recommendation> r = new ArrayList<Recommendation>();
 		for (MyDir myDir : result) {
-			r.add(new Recommendation(strength,RecommendationType.moveOrTurn,myDir));
+			r.add(new Recommendation(strength,RecommendationType.move,myDir));
 		}
 		return r;
 	}

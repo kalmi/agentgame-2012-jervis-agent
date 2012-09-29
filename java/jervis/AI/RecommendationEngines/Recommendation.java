@@ -7,7 +7,7 @@ import jervis.CommonTypes.MyDir;
 public class Recommendation implements Comparable<Recommendation>{
 	
 	public enum RecommendationType{
-		moveOrTurn, turn
+		moveOrTurn, turn, move
 	}
 	
 	private int strength;
@@ -33,7 +33,12 @@ public class Recommendation implements Comparable<Recommendation>{
 	}
 	
 	public void add(Recommendation r){
-		if(this.dir!=r.dir || this.recommendationType != r.recommendationType) throw new UnsupportedOperationException();
+		//if(this.dir!=r.dir || this.recommendationType != r.recommendationType) throw new UnsupportedOperationException();
 		this.strength += r.strength;
+	}
+
+	public void add(Recommendation r, double d) {
+		//if(this.dir!=r.dir || this.recommendationType != r.recommendationType) throw new UnsupportedOperationException();
+		this.strength += r.strength*d;
 	}
 }

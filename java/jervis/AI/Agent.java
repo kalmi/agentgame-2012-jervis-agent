@@ -24,10 +24,10 @@ public class Agent {
 	
 	@SuppressWarnings("serial")
 	List<RecommendationEngine> recommendationEngines = new ArrayList<RecommendationEngine>(){{
-		add(new EngineFoodLiker(1000));
-		add(new EngineTurnOnEat(100));
-		add(new EngineWallDisliker(10));
-		add(new EngineMultiplePathRouter(1));		
+		add(new EngineFoodLiker(2000));
+		add(new EngineTurnOnEat(200));
+		add(new EngineWallDisliker(20));
+		add(new EngineMultiplePathRouter(2));		
 	}};
 	
     public Agent() {

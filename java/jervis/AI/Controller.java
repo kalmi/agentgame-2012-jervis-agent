@@ -106,11 +106,13 @@ public class Controller {
 			}
 			
 			List<Recommendation> turnRecommendedness = new ArrayList<Recommendation>();
+			List<Recommendation> moveOrTurnRecommendedness = new ArrayList<Recommendation>();
 			List<Recommendation> moveRecommendedness = new ArrayList<Recommendation>();
 			
 			for (MyDir d : MyDir.values()) {
 				turnRecommendedness.add(new Recommendation(0, RecommendationType.turn, d));
-				moveRecommendedness.add(new Recommendation(0, RecommendationType.moveOrTurn, d));
+				moveOrTurnRecommendedness.add(new Recommendation(0, RecommendationType.moveOrTurn, d));
+				moveRecommendedness.add(new Recommendation(0, RecommendationType.move, d));
 			}
 			
 			
@@ -124,17 +126,23 @@ public class Controller {
 					}
 					if(r.recommendationType == Recommendation.RecommendationType.moveOrTurn){
 						//turnRecommendedness[r.dir.ordinal()] += r.strength;
-						moveRecommendedness.get(r.dir.ordinal()).add(r);
+						moveOrTurnRecommendedness.get(r.dir.ordinal()).add(r);
+						moveRecommendedness.get(r.dir.ordinal()).add(r, 0.5);
+						turnRecommendedness.get(r.dir.ordinal()).add(r, 0.5);
 					} else if(r.recommendationType == Recommendation.RecommendationType.turn){
 						turnRecommendedness.get(r.dir.ordinal()).add(r);
+					} else if(r.recommendationType == Recommendation.RecommendationType.move){
+						moveRecommendedness.get(r.dir.ordinal()).add(r);
+						moveOrTurnRecommendedness.get(r.dir.ordinal()).add(r, 0.5);
 					}	
 				}
 			}
 		
 			
 			List<Recommendation> recommendations = new ArrayList<Recommendation>();
-			recommendations.addAll(moveRecommendedness);
+			recommendations.addAll(moveOrTurnRecommendedness);
 			recommendations.addAll(turnRecommendedness);
+			recommendations.addAll(moveRecommendedness);
 			
 			Collections.sort(recommendations);
 			Collections.reverse(recommendations);
@@ -149,10 +157,10 @@ public class Controller {
 					} else {
 						return new Turn(r.dir);
 					}
-				} else if (r.recommendationType == RecommendationType.moveOrTurn) {
+				} else if (r.recommendationType == RecommendationType.moveOrTurn || r.recommendationType == RecommendationType.move) {
 					Command move = new Move(r.dir);
 					if (state.simpleIsAlive || !move.getDestination(me).equals(state.enemyAgent)){
-						if(r.dir == me.direction)
+						if(r.dir == me.direction ||  r.recommendationType == RecommendationType.move)
 							return move;
 						else
 							return new Turn(r.dir);

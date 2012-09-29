@@ -76,6 +76,7 @@ public class Agent {
 		}else{
 			boolean shouldBeOnFood = (onFood != null);			
 			boolean seemsToBeOnFood = false;
+			onFood = null;
 			for (Food food : p.visibleFoods) {
 				 if (food.equals(position)) {
 					 seemsToBeOnFood = true;

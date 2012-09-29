@@ -8,6 +8,7 @@ import jervis.AI.RecommendationEngines.*;
 import jervis.CommonTypes.Food;
 import jervis.CommonTypes.MyDir;
 import jervis.CommonTypes.Perception;
+import jervis.JasonLayer.Commands.Move;
 
 
 public class Agent {
@@ -18,6 +19,8 @@ public class Agent {
 	public int energy = 4000;
 	public int time = 1;	
 	public Food onFood = null;	
+	
+	public Move nextCommand = null;
 	
 	@SuppressWarnings("serial")
 	List<RecommendationEngine> recommendationEngines = new ArrayList<RecommendationEngine>(){{

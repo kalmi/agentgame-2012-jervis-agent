@@ -1,5 +1,6 @@
 package jervis.JasonLayer.Commands;
 
+import java.awt.Point;
 import java.util.Arrays;
 
 import jason.asSemantics.ActionExec;
@@ -32,4 +33,8 @@ public abstract class Command {
     }
 
 	public abstract void pretend(Agent agent, State state);
+	
+	public Point getDestination(Agent agent){
+		return agent.position;
+	}
 }

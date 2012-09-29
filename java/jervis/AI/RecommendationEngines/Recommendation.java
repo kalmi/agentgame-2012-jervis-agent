@@ -4,15 +4,20 @@ import jervis.CommonTypes.MyDir;
 
 
 
-public class Recommendation {
+public class Recommendation implements Comparable<Recommendation>{
 	
 	public enum RecommendationType{
 		moveOrTurn, turn
 	}
 	
-	public final int strength;
+	private int strength;
 	public final RecommendationType recommendationType;
 	public final MyDir dir;
+	
+	public int getStrength() {
+		return strength;
+	}
+
 	public Recommendation(int strength, RecommendationType recommendationType, MyDir dir) {
 		this.strength = strength;
 		this.recommendationType = recommendationType;
@@ -21,5 +26,14 @@ public class Recommendation {
 	
 	public String toString(){
 		return Integer.toString(strength) + ", " + recommendationType.name() + "," + dir.name(); 
+	}
+
+	public int compareTo(Recommendation other) {
+		return this.strength - other.strength;
+	}
+	
+	public void add(Recommendation r){
+		if(this.dir!=r.dir || this.recommendationType != r.recommendationType) throw new UnsupportedOperationException();
+		this.strength += r.strength;
 	}
 }

@@ -1,5 +1,7 @@
 package jervis.JasonLayer.Commands;
 
+import java.awt.Point;
+
 import jervis.AI.Agent;
 import jervis.AI.State;
 import jervis.CommonTypes.MyDir;
@@ -36,5 +38,29 @@ public class Move extends Command {
 			
 			agent.energy -= 5;
 		}
+	}
+	
+	@Override
+	public Point getDestination(Agent agent){
+		int dy = 0, dx = 0;
+		switch (dir) {
+		case up:
+			dy -= 1;
+			break;
+			
+		case right:
+			dx += 1;
+			break;
+			
+		case down:
+			dy += 1;
+			break;
+			
+		case left:
+			dx -= 1;
+			break;						
+		}
+		
+		return new Point(agent.position.x+dx, agent.position.y+dy);
 	}
 }

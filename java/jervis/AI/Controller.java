@@ -1,5 +1,10 @@
 package jervis.AI;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
 import jason.architecture.AgArch;
 import jason.asSemantics.ActionExec;
 
@@ -7,6 +12,7 @@ import jervis.AI.Debug.DebugFrame2;
 import jervis.AI.Debug.DebugToggle;
 import jervis.AI.RecommendationEngines.Recommendation;
 import jervis.AI.RecommendationEngines.RecommendationEngine;
+import jervis.AI.RecommendationEngines.Recommendation.RecommendationType;
 import jervis.CommonTypes.MyDir;
 import jervis.CommonTypes.Perception;
 import jervis.JasonLayer.Commands.*;
@@ -22,6 +28,8 @@ public class Controller {
 	State state = new State();
 	
 	int forgasHack = 0;
+
+	private Random random = new Random();
 	
 	public Controller(){
 		if(DebugToggle.ENABLED){
@@ -43,7 +51,15 @@ public class Controller {
 		state.processVisibleFoods(agent, p);
 		state.processEnemyAgents(agent, p);
 		
-		SimpleEnergyWatcher.run(p, state);
+		
+		final boolean simpleAlive = SimpleEnergyWatcher.run(p, state);
+		
+		if(!simpleAlive && state.simpleIsAlive){
+			System.out.println("Sir, our best friend is dead.");
+		} else if (simpleAlive && !state.simpleIsAlive) {
+			System.out.println("Sir, I'm sensing a zombie.");
+		}
+		state.simpleIsAlive = simpleAlive;
 
 		Command command = determineAppropiateCommandFor(agent);
 		
@@ -79,12 +95,25 @@ public class Controller {
 		if(me.onFood != null){
 			return new Eat();		
 		} else {
+			if(me.nextCommand != null){
+				Command tmp = me.nextCommand;
+				me.nextCommand = null;
+				return tmp;
+			}
+			
 			if(DebugToggle.ENABLED){
 				state.debugInfo.append("  Recommendations:\n");
 			}
 			
-			int[] turnRecommendedness = new int[4];
-			int[] moveRecommendedness = new int[4];
+			List<Recommendation> turnRecommendedness = new ArrayList<Recommendation>();
+			List<Recommendation> moveRecommendedness = new ArrayList<Recommendation>();
+			
+			for (MyDir d : MyDir.values()) {
+				turnRecommendedness.add(new Recommendation(0, RecommendationType.turn, d));
+				moveRecommendedness.add(new Recommendation(0, RecommendationType.moveOrTurn, d));
+			}
+			
+			
 						
 			for (RecommendationEngine engine : me.recommendationEngines) {
 				for (Recommendation r : engine.getRecommendation(state, me.id)) {
@@ -95,41 +124,87 @@ public class Controller {
 					}
 					if(r.recommendationType == Recommendation.RecommendationType.moveOrTurn){
 						//turnRecommendedness[r.dir.ordinal()] += r.strength;
-						moveRecommendedness[r.dir.ordinal()] += r.strength;
+						moveRecommendedness.get(r.dir.ordinal()).add(r);
 					} else if(r.recommendationType == Recommendation.RecommendationType.turn){
-						turnRecommendedness[r.dir.ordinal()] += r.strength;
+						turnRecommendedness.get(r.dir.ordinal()).add(r);
 					}	
 				}
 			}
+		
 			
-			int highestMoveRecommendedness = 0;
-			MyDir moveDir = null;;
-			for (int i = 0; i < moveRecommendedness.length; i++) {
-				if(highestMoveRecommendedness < moveRecommendedness[i]){
-					highestMoveRecommendedness = moveRecommendedness[i];
-					moveDir = MyDir.fromInt(i);
+			List<Recommendation> recommendations = new ArrayList<Recommendation>();
+			recommendations.addAll(moveRecommendedness);
+			recommendations.addAll(turnRecommendedness);
+			
+			Collections.sort(recommendations);
+			Collections.reverse(recommendations);
+			
+			for (Recommendation r : recommendations) {
+				if(r.getStrength() == 0) break; 
+				
+				if(r.recommendationType == RecommendationType.turn){
+					if(r.dir == me.direction){
+						System.out.println(" -Sir, you are dumb. We are already facing that way.");
+						continue;
+					} else {
+						return new Turn(r.dir);
+					}
+				} else if (r.recommendationType == RecommendationType.moveOrTurn) {
+					Command move = new Move(r.dir);
+					if (state.simpleIsAlive || !move.getDestination(me).equals(state.enemyAgent)){
+						if(r.dir == me.direction)
+							return move;
+						else
+							return new Turn(r.dir);
+					} else {
+						Command currentCommand;
+						if(me.position.x == 0 && (r.dir == MyDir.up || r.dir == MyDir.down)){
+							currentCommand = new Move(MyDir.right);
+							me.nextCommand = new Move(r.dir);
+						} else
+						if(me.position.x == 59 && (r.dir == MyDir.up || r.dir == MyDir.down)){
+							currentCommand = new Move(MyDir.left);
+							me.nextCommand = new Move(r.dir);
+						} else
+						if(me.position.y == 0 && (r.dir == MyDir.left || r.dir == MyDir.right)){
+							currentCommand = new Move(MyDir.down);
+							me.nextCommand = new Move(r.dir);
+						} else
+						if(me.position.y == 59 && (r.dir == MyDir.left || r.dir == MyDir.right)){
+							currentCommand = new Move(MyDir.up);
+							me.nextCommand = new Move(r.dir);
+						}else
+						if (r.dir == MyDir.up || r.dir == MyDir.down){
+							MyDir firstDir;
+							if(random.nextBoolean()){
+								firstDir = MyDir.left;
+							} else {
+								firstDir = MyDir.right;
+							}
+							
+							currentCommand = new Move(firstDir);
+							me.nextCommand = new Move(r.dir);
+						}else
+						if (r.dir == MyDir.left || r.dir == MyDir.right){
+							MyDir firstDir;
+							if(random.nextBoolean()){
+								firstDir = MyDir.up;
+							} else {
+								firstDir = MyDir.down;
+							}
+							
+							currentCommand = new Move(firstDir);
+							me.nextCommand = new Move(r.dir);
+						}else{
+							throw new RuntimeException();
+						}
+						return currentCommand;
+					}
 				}
 			}
 			
-			int highestTurnRecommendedness = 0;
-			MyDir turnDir = null;
-			for (int i = 0; i < turnRecommendedness.length; i++) {
-				if(highestTurnRecommendedness < turnRecommendedness[i]){
-					highestTurnRecommendedness = turnRecommendedness[i];
-					turnDir = MyDir.fromInt(i);
-				}
-			}
-			
-			boolean justTurn = ((highestMoveRecommendedness < highestTurnRecommendedness) /*&& turnDir != me.direction*/);
-			
-			if (highestMoveRecommendedness + highestTurnRecommendedness == 0)
-				return new Wait();
-			else if (justTurn)
-				return new Turn(turnDir);
-			else if (moveDir != me.direction)			
-				return new Turn(moveDir);				
-			else
-				return new Move(moveDir);		
+			return new Wait();
+
 		}
 	}
 }

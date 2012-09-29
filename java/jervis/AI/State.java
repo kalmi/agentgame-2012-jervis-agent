@@ -16,11 +16,16 @@ public class State {
 	final int numOfAgents = 5;
 	
 	public Agent[] agents = new Agent[numOfAgents];
+	public PerceivedAgent enemyAgent = null;
+	public boolean simpleIsAlive = true;
+	
 	public List<Food> foods = new ArrayList<Food>();
 	
 	public CircularArrayList<Integer> last4Consumption = new CircularArrayList<Integer>(4);
 	
 	public StringBuffer debugInfo = new StringBuffer();
+
+	
 	
 	public State(){}
 	
@@ -44,8 +49,10 @@ public class State {
 		if(p.visibleFoods != null) {
 			for (int i=foods.size()-1;i>=0;i--){
 				Point food = foods.get(i);
-				if(perceiver.canSee(foods.get(i)) && !p.visibleFoods.contains(food))
+				if(perceiver.canSee(foods.get(i)) && !p.visibleFoods.contains(food)){
+					System.out.println("Who stole my cookie? http://www.youtube.com/watch?v=7enjABApKWE");
 			    	foods.remove(i);
+				}
 			}
 					
 			for (Food food : p.visibleFoods){
@@ -62,10 +69,13 @@ public class State {
 	
 
 	public void processEnemyAgents(Agent agent, Perception p) {
+		if(simpleIsAlive)	
+			enemyAgent = null;
+		
 		if(p.visibleAgents != null){
 			for (PerceivedAgent otherAgent : p.visibleAgents) {
 				if(otherAgent.teamId != p.myteam){
-					//TODO
+					enemyAgent = otherAgent;
 				}
 			}
 		}

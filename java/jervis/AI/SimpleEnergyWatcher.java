@@ -7,31 +7,30 @@ public class SimpleEnergyWatcher {
 	static Integer simpleId = null;
 	static boolean simpleAteLastRound = false;
 	
-	static void run(Perception p, State state){		
+	static boolean run(Perception p, State state){		
 		if(simpleId == null && p.time > 1){
 			simpleId = determineSimpleId(state);
 		}
-					
+		
 		if(p.time > 1){
-			
-			if(p.internalId != (simpleId+1) % 5)
-				return;
-			
-			int myCollectiveEnergy = Agent.getCollectiveEnergy(state.agents);
-			int otherTeamCollectiveEnergy = ((int)((double)myCollectiveEnergy/p.ratio)) - myCollectiveEnergy;
-			
-			Agent agent = state.getAgent(p.internalId);
-			
-			if(p.time > 2){
-				boolean simpleAteThisRound = (otherTeamCollectiveEnergy>otherTeamCollectiveEnergyLastRound+4);
-				if(simpleAteLastRound && !simpleAteThisRound){
-					state.last4Consumption.insert(agent.getInternalTime()-1);					
+			int otherTeamCollectiveEnergy = getSimpleEnergy(p, state);
+			if(otherTeamCollectiveEnergy<100) return false;
+			if(p.internalId == (simpleId+1) % 5){
+				Agent agent = state.getAgent(p.internalId);
+				
+				if(p.time > 2){
+					boolean simpleAteThisRound = (otherTeamCollectiveEnergy>otherTeamCollectiveEnergyLastRound+6);
+					if(simpleAteLastRound && !simpleAteThisRound){
+						state.last4Consumption.insert(agent.getInternalTime()-1);					
+					}
+					simpleAteLastRound = simpleAteThisRound;
+					
+					 
 				}
-				simpleAteLastRound = simpleAteThisRound;
+				otherTeamCollectiveEnergyLastRound = otherTeamCollectiveEnergy;
 			}
-			
-			otherTeamCollectiveEnergyLastRound = otherTeamCollectiveEnergy;
 		}
+		return true;
 	}
 
 	private static int determineSimpleId(State state) {
@@ -43,5 +42,15 @@ public class SimpleEnergyWatcher {
 			}
 		}
 		return id;
+	}
+	
+	public static boolean isSimpleAlive(Perception p, State state){
+		return !(getSimpleEnergy(p, state) < 100);
+	}
+	
+	private static int getSimpleEnergy(Perception p, State state){
+		int myCollectiveEnergy = Agent.getCollectiveEnergy(state.agents);
+		int otherTeamCollectiveEnergy = ((int)((double)myCollectiveEnergy/p.ratio)) - myCollectiveEnergy;
+		return otherTeamCollectiveEnergy;
 	}
 }

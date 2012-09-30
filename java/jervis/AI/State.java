@@ -51,7 +51,7 @@ public class State {
 			for (int i=foods.size()-1;i>=0;i--){
 				Point food = foods.get(i);
 				if(perceiver.canSee(foods.get(i)) && !p.visibleFoods.contains(food)){
-					System.out.println("Who stole my cookie? http://www.youtube.com/watch?v=7enjABApKWE");
+					System.out.println("- Sir, MY COOOKIE IS GONE! http://www.youtube.com/watch?v=7enjABApKWE");
 			    	foods.remove(i);
 				}
 			}

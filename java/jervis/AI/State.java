@@ -22,6 +22,7 @@ public class State {
 	public List<Food> foods = new ArrayList<Food>();
 	
 	public CircularArrayList<Integer> last4Consumption = new CircularArrayList<Integer>(4);
+	public CircularArrayList<Integer> last4NewSeen = new CircularArrayList<Integer>(4);
 	
 	public StringBuffer debugInfo = new StringBuffer();
 
@@ -62,6 +63,7 @@ public class State {
 					foods.get(posInList).value = food.value;
 				}else{
 					foods.add(food);
+					last4NewSeen.insert(perceiver.getInternalTime());
 				}
 			}
 		}

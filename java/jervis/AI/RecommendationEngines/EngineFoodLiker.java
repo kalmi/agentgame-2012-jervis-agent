@@ -20,7 +20,7 @@ public class EngineFoodLiker extends RecommendationEngine {
 	}
 
 		@SuppressWarnings("serial")
-		List<Rectangle> boundPerAgent = new ArrayList<Rectangle>(){{
+		static List<Rectangle> boundPerAgent = new ArrayList<Rectangle>(){{
 		/*
 			add(new Rectangle(0,  0, 60, 60));
 			add(new Rectangle(0,  0, 60, 60));
@@ -44,7 +44,7 @@ public class EngineFoodLiker extends RecommendationEngine {
 					
 		}};
 	
-	public boolean okForAgent(Point food, Agent agent){
+	public static boolean okForAgent(Point food, Agent agent){
 		//ArrayList<Rectangle> bounds = boundListPerAgent.get(agent.id-1);
 		Rectangle r = boundPerAgent.get(agent.id);
 		boolean inBound = false;

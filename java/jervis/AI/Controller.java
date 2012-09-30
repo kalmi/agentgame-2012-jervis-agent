@@ -55,9 +55,9 @@ public class Controller {
 		final boolean simpleAlive = SimpleEnergyWatcher.run(p, state);
 		
 		if(!simpleAlive && state.simpleIsAlive){
-			System.out.println("Sir, our best friend is dead.");
+			System.out.println("-Sir, our best friend is dead.");
 		} else if (simpleAlive && !state.simpleIsAlive) {
-			System.out.println("Sir, I'm sensing a zombie.");
+			System.out.println("-Sir, I'm sensing a zombie.");
 		}
 		state.simpleIsAlive = simpleAlive;
 
@@ -69,7 +69,7 @@ public class Controller {
 		if(action.getResult() == true){
 			command.pretend(agent, state);
 		} else {
-			System.out.println( command.toString() + " failed." );
+			System.out.println( "-Sir, this is not good: " + command.toString() + " failed." );
 		}
 		
 		
@@ -158,7 +158,7 @@ public class Controller {
 				
 				if(r.recommendationType == RecommendationType.turn){
 					if(r.dir == me.direction){
-						System.out.println(" -Sir, you are dumb. We are already facing that way.");
+						System.out.println("-Sir, you are dumb. We are already facing that way.");
 						continue;
 					} else {
 						return new Turn(r.dir);

@@ -52,31 +52,31 @@ public class Agent {
     	
     	if(p.internalId != id){
     		id = p.internalId;
-			debug("- Test complete. Preparing to power down and begin diagnostics..."); 
-			debug("- Uh, yeah, tell you what. Do a weather and ATC check, start listening in on ground control."); 
-			debug("- Sir, there are still terabytes of calculations required before an actual flight is..."); 
-			debug("- Jarvis... sometimes you gotta run before you can walk.");
+			debug("-Test complete. Preparing to power down and begin diagnostics..."); 
+			debug("-Uh, yeah, tell you what. Do a weather and ATC check, start listening in on ground control."); 
+			debug("-Sir, there are still terabytes of calculations required before an actual flight is..."); 
+			debug("-Jarvis... sometimes you gotta run before you can walk.");
 		}
     	
     	if(p.jasonId!=order){
     		order = p.jasonId;
-    		debug("- Sir, I am number " + Integer.toString(order) + " in order.");
+    		debug("-Sir, I am number " + Integer.toString(order) + " in order.");
     	}
     	
     	
 		if(!p.mypos.equals(position)){
-			debug(" - Sir, it appears that we are losing altitude. Adjusting...");
+			debug("-Sir, it appears that we are losing altitude. Adjusting...");
 			position = p.mypos;
 		}
 		
 		if(!p.mydir.equals(direction)){
-			debug(" - Sir, I don't think I actually look the way I think I do. Adjusting...");
+			debug("-Sir, I don't think I actually look the way I think I do. Adjusting...");
 			direction = p.mydir;
 		}
     	
 		//onFood depends on properly set "this.position" (dependency)
 		if(p.visibleFoods == null){
-			debug(" - Sir, we have temporarly lost our \"food\" sensors. ");
+			debug("-Sir, we have temporarly lost our \"food\" sensors. ");
 		}else{
 			boolean shouldBeOnFood = (onFood != null);			
 			boolean seemsToBeOnFood = false;
@@ -89,19 +89,19 @@ public class Agent {
 			}			
 			if(shouldBeOnFood == seemsToBeOnFood){
 				if(shouldBeOnFood && !seemsToBeOnFood){
-					debug(" - Sir, I was anticipating that we would be sitting on a food now, but are in fact not.");
+					debug("-Sir, I was anticipating that we would be sitting on a food now, but are in fact not.");
 				} else if (shouldBeOnFood && !seemsToBeOnFood){
-					debug(" - Sir, an unanticipated sudden food appeared under us.");
+					debug("-Sir, an unanticipated sudden food appeared under us.");
 				}
 			}	
 		}
 		
 		if(p.visibleAgents == null){
-			debug(" - Sir, we have temporarly lost our \"agent\" sensors. ");
+			debug("-Sir, we have temporarly lost our \"agent\" sensors. ");
 		}	
 		
 		if(p.myenergy != energy){
-			debug(" - Sir, I am experiencing unexpected energy fluctuations. Adjusting...");
+			debug("-Sir, I am experiencing unexpected energy fluctuations. Adjusting...");
 			energy = p.myenergy;
 		}
 		

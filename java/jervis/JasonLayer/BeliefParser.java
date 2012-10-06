@@ -16,6 +16,10 @@ public class BeliefParser {
 	static Map<String, Integer> mapping = new HashMap<String, Integer>();
 	static Integer largestId = -1;
 	
+	public static String parseName(Literal item){
+		return item.getTerm(0).toString();
+	}
+	
 	public static int parseNameAndGetId(Literal item){
 		String myname_str = item.getTerm(0).toString();
 		if(mapping.containsKey(myname_str)){

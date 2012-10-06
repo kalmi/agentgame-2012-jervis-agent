@@ -11,6 +11,7 @@ import jervis.JasonLayer.LiteralType;
 
 public class Perception {
 
+	public final String myname;
 	public final int internalId;
 	public final Point mypos;
 	public final MyDir mydir;
@@ -25,6 +26,7 @@ public class Perception {
 	
 	public Perception(BeliefBase bb) {
 	
+		String myname = null;
 		Integer internalId = null;
 		Point mypos = null;
 		MyDir mydir = null;
@@ -49,6 +51,7 @@ public class Perception {
 				
 			
 			case myname:
+				myname = BeliefParser.parseName(item);
 				internalId = BeliefParser.parseNameAndGetId(item);
 				break;
 				
@@ -89,6 +92,7 @@ public class Perception {
 			}
 		}
 		
+		this.myname = myname;
 		this.jasonId = jasonId;
 		this.internalId = internalId;
 		this.mypos = mypos;

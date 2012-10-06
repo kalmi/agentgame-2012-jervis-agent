@@ -14,5 +14,6 @@ public enum LiteralType {
 	agent,
 	lastattacker,
 	mypos,
-	teammate
+	teammate,
+	inwater
 }

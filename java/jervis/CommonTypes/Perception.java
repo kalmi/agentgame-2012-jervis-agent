@@ -1,6 +1,7 @@
 package jervis.CommonTypes;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -22,7 +23,9 @@ public class Perception {
 	public final int myteam;
 	public final int time;
 	public final int jasonId;
+	public final boolean inwater;
 	 
+	static boolean enemyUsedBroadcast = false;
 	
 	public Perception(BeliefBase bb) {
 	
@@ -37,11 +40,23 @@ public class Perception {
 		Integer myTeamId = null;
 		Integer time = null;
 		Integer jasonId = null;
+		boolean inwater = false;
+		
 		
 		Iterator<Literal> iter = bb.iterator();
+		List<Literal> toBeRemoved = new ArrayList<Literal>();
 		while (iter.hasNext()) {
 			Literal item = iter.next();
-			LiteralType type = LiteralType.valueOf(item.getFunctor());
+			LiteralType type;
+			try{
+				type = LiteralType.valueOf(item.getFunctor());
+			} catch (IllegalArgumentException e){
+				enemyUsedBroadcast = true;
+				toBeRemoved.add(item);
+				//System.out.println("-Sir, I cannot recognize the following belief: " + item.getFunctor());
+				continue;
+			}
+
 			
 			switch (type) {
 			
@@ -86,10 +101,18 @@ public class Perception {
 			case time:
 				time = BeliefParser.parseTime(item);
 				break;				
+
+			case inwater:
+				inwater = true;
+				break;
 				
 			default:
 				break;
 			}
+		}
+		
+		for (Literal literal : toBeRemoved) {
+			bb.remove(literal);
 		}
 		
 		this.myname = myname;
@@ -103,7 +126,7 @@ public class Perception {
 		this.myenergy = myenergy;
 		this.myteam = myTeamId;
 		this.time = time;
-		
+		this.inwater = inwater;
 		
 
 	}

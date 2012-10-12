@@ -22,22 +22,18 @@ public class EngineMultiplePathRouter extends RecommendationEngine {
 		
 		add(new ArrayList<Point>(){{
 			add(new Point(10,10));
-			add(new Point(28,10));
 		}});
 		
 		add(new ArrayList<Point>(){{
-			add(new Point(10,31));
 			add(new Point(10,49));
 		}});
 		
 		add(new ArrayList<Point>(){{
-			add(new Point(31,49));
 			add(new Point(49,49));
 		}});
 		
 		add(new ArrayList<Point>(){{
 			add(new Point(49,10));
-			add(new Point(49,28));
 		}});
 		
 		add(new ArrayList<Point>(){{
@@ -53,7 +49,7 @@ public class EngineMultiplePathRouter extends RecommendationEngine {
 	public List<Recommendation> getRecommendation(State state, int myId) {
 		EnumSet<MyDir> result = EnumSet.noneOf(MyDir.class);
 		
-		Agent agent = state.agents[myId];
+		Agent agent = state.agentsInOrder[myId];
 		int x = agent.position.x;
 		int y = agent.position.y;
 		

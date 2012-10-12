@@ -17,7 +17,7 @@ public class Stat {
 	public static void logCommand(Agent agent, Command command){
 		if(DebugToggle.ENABLED){
 			String commandName = command.getClass().getSimpleName();
-			int id = agent.id;
+			int id = agent.order;
 			if(commandName.endsWith("Wait")){
 				waited[id]++;
 			} else if(commandName.endsWith("Turn")){
@@ -34,7 +34,7 @@ public class Stat {
 	
 	public static void logEatFinshed(Agent agent){
 		if(DebugToggle.ENABLED){
-			ateFinished[agent.id]++;
+			ateFinished[agent.order]++;
 		}
 	}
 	

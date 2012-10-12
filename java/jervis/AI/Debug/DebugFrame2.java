@@ -163,25 +163,25 @@ public class DebugFrame2 extends JFrame implements ChangeListener{
 			}
 
 			public int getRowCount() {
-				return state.agents.length;
+				return state.agentsInOrder.length;
 			}
 
 			public Object getValueAt(int rowIndex, int columnIndex) {
 				int key = rowIndex;
 				if(columnIndex == 0){
-					return state.agents[key].id;
+					return state.agentsInOrder[key].order;
 				}
 				else if(columnIndex == 1){
-					return state.agents[key].direction.name();
+					return state.agentsInOrder[key].direction.name();
 				}
 				else if(columnIndex == 2){
-					return state.agents[key].position.x;
+					return state.agentsInOrder[key].position.x;
 				}
 				else if(columnIndex == 3){
-					return state.agents[key].position.y;
+					return state.agentsInOrder[key].position.y;
 				}
 				else if(columnIndex == 4){
-					return state.agents[key].energy;
+					return state.agentsInOrder[key].energy;
 				}
 				return "ERROR";
 				

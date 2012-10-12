@@ -21,7 +21,7 @@ public class EngineFoodLiker extends RecommendationEngine {
 
 		@SuppressWarnings("serial")
 		static List<Rectangle> boundPerAgent = new ArrayList<Rectangle>(){{
-		/*
+		
 			add(new Rectangle(0,  0, 60, 60));
 			add(new Rectangle(0,  0, 60, 60));
 			add(new Rectangle(0,  0, 60, 60));
@@ -29,24 +29,13 @@ public class EngineFoodLiker extends RecommendationEngine {
 			add(new Rectangle(0,  0, 60, 60));
 			add(new Rectangle(0,  0, 60, 60));
 			add(new Rectangle(0,  0, 60, 60));
-			*/
-			
-			
-			add(new Rectangle(0,  0, 39, 21));
-			
-			add(new Rectangle(0,  21, 21, 39));
-			
-			add(new Rectangle(21, 39, 39, 21));
-			
-			add(new Rectangle(59-21+1, 0, 21, 39));
-			
-			add(new Rectangle(10, 10, 40, 40));
+
 					
 		}};
 	
 	public static boolean okForAgent(Point food, Agent agent){
 		//ArrayList<Rectangle> bounds = boundListPerAgent.get(agent.id-1);
-		Rectangle r = boundPerAgent.get(agent.id);
+		Rectangle r = boundPerAgent.get(agent.order);
 		boolean inBound = false;
 		//for (Rectangle r : bounds) {
 			if(r.contains(food))
@@ -61,7 +50,7 @@ public class EngineFoodLiker extends RecommendationEngine {
 		if(state.foods.size() == 0)
 			return new ArrayList<Recommendation>();
 		
-		Agent agent = state.agents[myId];
+		Agent agent = state.agentsInOrder[myId];
 		
 		Point closestFood = null;
 		int closestDistance = Integer.MAX_VALUE;
@@ -79,7 +68,7 @@ public class EngineFoodLiker extends RecommendationEngine {
 			Agent closestToAgent = null;
 			int closestDistanceToAgent = Integer.MAX_VALUE;
 			
-			for (Agent otherAgent : state.agents) {
+			for (Agent otherAgent : state.agentsInOrder) {
 				
 				if(otherAgent == null)
 					continue;

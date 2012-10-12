@@ -2,12 +2,15 @@ package jervis.AI;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import jason.architecture.AgArch;
 import jason.asSemantics.ActionExec;
 
+import jervis.Config;
 import jervis.AI.Debug.DebugFrame2;
 import jervis.AI.Debug.DebugToggle;
 import jervis.AI.RecommendationEngines.Recommendation;
@@ -23,31 +26,41 @@ import jervis.JasonLayer.Commands.*;
 
 public class Controller {
 	
-	DebugFrame2 debugFrame;
-	
-	State state = new State();
-	
-	int forgasHack = 0;
-
+	DebugFrame2 debugFrame;	
+	State state;
 	private Random random = new Random();
 	
-	public Controller(){
+	private final Map<String, Agent> mapping = new HashMap<String, Agent>();
+	
+	public Controller(Config config) {
 		if(DebugToggle.GUIENABLED){
 			debugFrame = new DebugFrame2();
 		}
+		state = new State(config);
 	}
-	
-	public void process(Perception p, AgArch agArch) {		
 
+	public void process(Config config, Perception p, AgArch agArch) {		
 		if(DebugToggle.GUIENABLED){
 			state.debugInfo = new StringBuffer();
 			state.debugInfo.append("Agent #");
-			state.debugInfo.append(p.internalId);
+			state.debugInfo.append(p.idFromName);
 			state.debugInfo.append("\n\n");
 		}
 		
-		Agent agent = state.getAgent(p.internalId);	
+		if(!mapping.containsKey(p.myname)){
+			Agent agent = new Agent(p.myname, config);
+			mapping.put(p.myname, agent);
+			state.agentsInOrder[agent.order] = agent;
+		}
+		
+		Agent agent = mapping.get(p.myname);
+		
 		agent.update(p);		
+		
+		/*System.out.println();
+		System.out.println(agent.myName);
+		System.out.println(agent.order);*/
+		
 		state.processVisibleFoods(agent, p);
 		state.processEnemyAgents(agent, p);
 		
@@ -88,7 +101,7 @@ public class Controller {
 		
 		Stat.logCommand(agent, command);
 		
-		if(agent.order >= 4 && p.time == 14999){
+		if(agent.order >= config.numOfJervis-1 && p.time == 14999){
 			for (String line: Stat.getSummary().split("\n")) {
 				System.out.println(line);
 			}
@@ -124,7 +137,7 @@ public class Controller {
 			
 						
 			for (RecommendationEngine engine : me.recommendationEngines) {
-				for (Recommendation r : engine.getRecommendation(state, me.id)) {
+				for (Recommendation r : engine.getRecommendation(state, me.order)) {
 					if(DebugToggle.ENABLED){
 						state.debugInfo.append("    ");
 						state.debugInfo.append(r.toString());
@@ -154,7 +167,7 @@ public class Controller {
 			Collections.reverse(recommendations);
 			
 			for (Recommendation r : recommendations) {
-				if(r.getStrength() == 0) break; 
+				if(r.getStrength() <= 2) break;
 				
 				if(r.recommendationType == RecommendationType.turn){
 					if(r.dir == me.direction){

@@ -5,38 +5,38 @@ import jervis.CommonTypes.Perception;
 
 public class SimpleEnergyWatcher {
 	static Integer otherTeamCollectiveEnergyLastRound = null;
-	static boolean simpleAteLastRound = false;
 	
 	static boolean run(Perception p, State state){		
 		
 		if(p.time > 1){
-			int otherTeamCollectiveEnergy = getSimpleEnergy(p, state);
-			if(otherTeamCollectiveEnergy<100) return false;
-			if(p.internalId == 0){
-				Agent agent = state.getAgent(p.internalId);
+			int otherTeamCollectiveEnergy = getOtherTeamEnergy(p, state);
+			if(otherTeamCollectiveEnergy<(state.config.numOfEnemy*100)) return false;
+			
+			Agent agent = state.getAgent(p.idFromName);
+			if(otherTeamCollectiveEnergyLastRound != null){
+				boolean simpleAteThisRound = (otherTeamCollectiveEnergy>otherTeamCollectiveEnergyLastRound+6);
 				
-				if(p.time > 2 && otherTeamCollectiveEnergyLastRound != null){
-					boolean simpleAteThisRound = (otherTeamCollectiveEnergy>otherTeamCollectiveEnergyLastRound+6);
-					
-					if(simpleAteThisRound) Stat.logSimpleEat();
-					
-					if(simpleAteLastRound && !simpleAteThisRound){
-						state.last4Consumption.insert(agent.getInternalTime()-1);
-						Stat.logSimpleEatFinished();
-					}
-					simpleAteLastRound = simpleAteThisRound;
-					
-					 
+				if(simpleAteThisRound) {
+					Stat.logSimpleEat();
+					agent.doIComeAfterEnemy = true; 
 				}
-				otherTeamCollectiveEnergyLastRound = otherTeamCollectiveEnergy;
+				
+				if(agent.otherTeamWasSeenEatingByMeLastTime && !simpleAteThisRound){
+					state.last4Consumption.insert(agent.getInternalTime()-1);
+					Stat.logSimpleEatFinished();
+				}
+				agent.otherTeamWasSeenEatingByMeLastTime = simpleAteThisRound;
+				
+				 
 			}
+			otherTeamCollectiveEnergyLastRound = otherTeamCollectiveEnergy;
+		
 		}
 		return true;
 	}
-
 	
-	private static int getSimpleEnergy(Perception p, State state){
-		int myCollectiveEnergy = Agent.getCollectiveEnergy(state.agents);
+	private static int getOtherTeamEnergy(Perception p, State state){
+		int myCollectiveEnergy = Agent.getCollectiveEnergy(state.agentsInOrder);
 		int otherTeamCollectiveEnergy = ((int)((double)myCollectiveEnergy/p.ratio)) - myCollectiveEnergy;
 		return otherTeamCollectiveEnergy;
 	}

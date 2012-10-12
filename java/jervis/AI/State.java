@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import jervis.Config;
 import jervis.AI.Utils.CircularArrayList;
 import jervis.CommonTypes.Food;
 import jervis.CommonTypes.PerceivedAgent;
@@ -13,9 +14,9 @@ import jervis.CommonTypes.Perception;
 
 public class State {
 	
-	final int numOfAgents = 5;
 	
-	public Agent[] agents = new Agent[numOfAgents];
+	
+	public final Agent[] agentsInOrder;
 	public PerceivedAgent enemyAgent = null;
 	public boolean simpleIsAlive = true;
 	
@@ -25,27 +26,33 @@ public class State {
 	public CircularArrayList<Integer> last4NewSeen = new CircularArrayList<Integer>(4);
 	
 	public StringBuffer debugInfo = new StringBuffer();
+	
+	public final Config config;
 
 	
-	
-	public State(){}
-	
+
 	public State(State s){
+		this.config = s.config;
 		debugInfo.append(s.debugInfo);
+		
+		this.agentsInOrder = new Agent[s.agentsInOrder.length];
+		
 		for (Food food : s.foods) {
 			foods.add(new Food(food));
 		}
 		
-		for (Agent original : s.agents) {
-			Agent agent = new Agent();
-			agent.direction = original.direction;
-			agent.position = (Point) original.position.clone();
-			agent.id = original.id;
-			agents[original.id] = agent;
+		for (Agent original : s.agentsInOrder) {
+			agentsInOrder[original.order] = new Agent(original);
 		}
 	}
 	
 	
+	public State(Config config) {
+		this.agentsInOrder = new Agent[config.numOfJervis];
+		this.config = config;
+	}
+
+
 	public void processVisibleFoods(Agent perceiver, Perception p){
 		if(p.visibleFoods != null) {
 			for (int i=foods.size()-1;i>=0;i--){
@@ -85,10 +92,10 @@ public class State {
 	}
 
 	public Agent getAgent(int internalId) {
-		Agent agent = this.agents[internalId];		
+		Agent agent = this.agentsInOrder[internalId];		
 		if(agent == null){
-			agent = new Agent();
-			this.agents[internalId] = agent;
+			//agent = new Agent();
+			this.agentsInOrder[internalId] = agent;
 		}
 		return agent;
 	}

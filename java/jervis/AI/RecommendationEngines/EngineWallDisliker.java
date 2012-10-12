@@ -17,7 +17,7 @@ public class EngineWallDisliker extends RecommendationEngine {
 	}
 
 	public List<Recommendation> getRecommendation(State state, int myId) {
-		Agent agent = state.agents[myId];
+		Agent agent = state.agentsInOrder[myId];
 		EnumSet<MyDir> result = EnumSet.noneOf(MyDir.class);
 		
 		int x = agent.position.x;

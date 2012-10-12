@@ -13,7 +13,7 @@ import jervis.JasonLayer.LiteralType;
 public class Perception {
 
 	public final String myname;
-	public final int internalId;
+	public final int idFromName;
 	public final Point mypos;
 	public final MyDir mydir;
 	public final List<Food> visibleFoods;
@@ -117,7 +117,7 @@ public class Perception {
 		
 		this.myname = myname;
 		this.jasonId = jasonId;
-		this.internalId = internalId;
+		this.idFromName = internalId;
 		this.mypos = mypos;
 		this.mydir = mydir;
 		this.visibleFoods = visibleFoods;

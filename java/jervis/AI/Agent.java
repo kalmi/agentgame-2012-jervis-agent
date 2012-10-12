@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import jervis.Config;
 import jervis.AI.RecommendationEngines.*;
 import jervis.CommonTypes.Food;
 import jervis.CommonTypes.MyDir;
@@ -12,15 +13,21 @@ import jervis.JasonLayer.Commands.Move;
 
 
 public class Agent {
-    public int id = -1;
-    public int order;
+	public final String myName;
+    public final int order;
+    
     public Point position;
-    public MyDir direction;
-	public int energy = 4000;
-	public int time = 1;	
-	public Food onFood = null;	
+    public MyDir direction;   
+	public int energy;
+	public Food onFood = null;
+	public int time = 1;
 	
 	public Move nextCommand = null;
+	
+	public boolean otherTeamWasSeenEatingByMeLastTime = false;
+	public boolean doIComeAfterEnemy = false;
+	
+	private final Config config; 
 	
 	@SuppressWarnings("serial")
 	List<RecommendationEngine> recommendationEngines = new ArrayList<RecommendationEngine>(){{
@@ -31,17 +38,31 @@ public class Agent {
 		add(new EngineAxisKeeperHack(2));	
 	}};
 	
-    public Agent() {
-		// TODO Auto-generated constructor stub
+	private static int orderCounter = 0;
+	
+    public Agent(String myName, Config config) {
+    	this.config = config;
+		this.myName = myName;
+		this.order = orderCounter++;
+		this.energy = 20000/config.numOfJervis;
 	}
     
-    public int getInternalTime(){
-    	return time*6 + order;
+    public Agent(Agent original) {
+    	this.doIComeAfterEnemy = original.doIComeAfterEnemy;
+    	this.config = original.config;
+    	this.direction = original.direction;
+    	this.position = (Point) original.position.clone();
+    	this.order = original.order;
+    	this.myName = original.myName; 
+	}
+
+	public int getInternalTime(){
+    	return time*config.numOfJervis + order;
     }
 
-    private boolean debugOutputtedThisRound;
+    private boolean debugOutputtedThisRound;	
     private void debug(String text){
-    	System.out.println("[" + Integer.toString(id) + ":"+ Integer.toString(time) +"] " + text);
+    	System.out.println("[" + Integer.toString(order) + ":"+ Integer.toString(time) +"] " + text);
     	debugOutputtedThisRound = true;
     }
     
@@ -50,8 +71,8 @@ public class Agent {
     	debugOutputtedThisRound = false;
     	time = p.time;
     	
-    	if(p.internalId != id){
-    		id = p.internalId;
+    	/*if(p.idFromName != order){
+    		id = p.idFromName;
 			debug("-Test complete. Preparing to power down and begin diagnostics..."); 
 			debug("-Uh, yeah, tell you what. Do a weather and ATC check, start listening in on ground control."); 
 			debug("-Sir, there are still terabytes of calculations required before an actual flight is..."); 
@@ -61,7 +82,7 @@ public class Agent {
     	if(p.jasonId!=order){
     		order = p.jasonId;
     		debug("-Sir, I am number " + Integer.toString(order) + " in order.");
-    	}
+    	}*/
     	
     	
 		if(!p.mypos.equals(position)){
@@ -133,8 +154,10 @@ public class Agent {
     
     public String toString(){
     	StringBuilder s = new StringBuilder();
-		s.append("Agent #");
-		s.append(id);
+		s.append("Agent ");
+		s.append(myName);
+		s.append(" #");
+		s.append(order);
 		s.append("\n");
 		s.append("  Pos: ");
 		s.append(position.x);

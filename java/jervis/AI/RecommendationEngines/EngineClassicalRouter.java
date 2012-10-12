@@ -30,7 +30,7 @@ public class EngineClassicalRouter extends RecommendationEngine {
 	public List<Recommendation> getRecommendation(State state, int myId) {
 		EnumSet<MyDir> result = EnumSet.noneOf(MyDir.class);
 		
-		Agent agent = state.agents[myId];
+		Agent agent = state.agentsInOrder[myId];
 		int x = agent.position.x;
 		int y = agent.position.y;
 		

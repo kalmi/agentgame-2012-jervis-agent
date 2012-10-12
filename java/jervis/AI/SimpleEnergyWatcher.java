@@ -1,5 +1,7 @@
 package jervis.AI;
 
+import jervis.CommonTypes.Perception;
+
 
 public class SimpleEnergyWatcher {
 	static Integer otherTeamCollectiveEnergyLastRound = null;

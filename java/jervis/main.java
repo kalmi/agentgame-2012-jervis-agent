@@ -15,8 +15,11 @@ public class main extends DefaultInternalAction{
 	}
 
 	public Object execute(TransitionSystem ts, final Unifier un, final Term[] arg) throws Exception {
-		
-		Agent agent = ts.getAg();		
+		return executeS(ts, un, arg);
+	}
+	
+	public static synchronized Object executeS(TransitionSystem ts, final Unifier un, final Term[] arg) throws Exception {
+		jason.asSemantics.Agent agent = ts.getAg();		
 		Perception perception = new Perception(agent.getBB());
 		
 		controller.process(perception, ts.getUserAgArch());

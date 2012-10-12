@@ -153,7 +153,8 @@ public class Agent {
 	public static int getCollectiveEnergy(Agent[] agents) {
 		int energy = 0;
 		for (Agent agent : agents) {
-			energy += agent.energy;
+      if(agent!=null) //SHOULD NOT HAPPEN (syncronization in main probably solved it)
+        energy += agent.energy;
 		}
 		return energy;
 	}

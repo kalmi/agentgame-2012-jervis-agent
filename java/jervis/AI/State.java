@@ -2,6 +2,7 @@ package jervis.AI;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import jervis.AI.Utils.CircularArrayList;
@@ -16,7 +17,7 @@ public class State {
 	
 	
 	public final Agent[] agentsInOrder;
-	public PerceivedAgent enemyAgent = null;
+	public List<PerceivedAgent> enemyAgents;
 	public boolean simpleIsAlive = true;
 	
 	public List<Food> foods = new ArrayList<Food>();
@@ -74,17 +75,16 @@ public class State {
 	
 
 	public void processEnemyAgents(Agent agent, Perception p) {
-		if(simpleIsAlive)	
-			enemyAgent = null;
-		
+		List<PerceivedAgent> list = new LinkedList<PerceivedAgent>();
 		if(p.visibleAgents != null){
 			for (PerceivedAgent otherAgent : p.visibleAgents) {
 				if(otherAgent.teamId != p.myteam){
-					enemyAgent = otherAgent;
+					list.add(otherAgent);
 					Stat.logSimpleSeen();
 				}
 			}
 		}
+		enemyAgents = list;
 	}
 
 	public Agent getAgent(int internalId) {

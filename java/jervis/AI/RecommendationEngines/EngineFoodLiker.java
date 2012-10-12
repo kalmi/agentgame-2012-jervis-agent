@@ -9,6 +9,7 @@ import jervis.AI.Agent;
 import jervis.AI.State;
 import jervis.AI.RecommendationEngines.Recommendation.RecommendationType;
 import jervis.CommonTypes.MyDir;
+import jervis.CommonTypes.PerceivedAgent;
 
 
 
@@ -56,9 +57,11 @@ public class EngineFoodLiker extends RecommendationEngine {
 		int closestDistance = Integer.MAX_VALUE;
 		for (Point food : state.foods) {
 			
-			if(state.enemyAgent != null)
-				if(state.enemyAgent.x == food.x && state.enemyAgent.y == food.y)
-					continue;
+			if(state.enemyAgents != null)
+				for (PerceivedAgent e : state.enemyAgents)
+					if(e != null)
+						if(e.x == food.x && e.y == food.y)
+							continue;
 			
 			if(!okForAgent(food, agent))
 				continue;

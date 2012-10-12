@@ -16,6 +16,7 @@ import jervis.AI.RecommendationEngines.Recommendation;
 import jervis.AI.RecommendationEngines.RecommendationEngine;
 import jervis.AI.RecommendationEngines.Recommendation.RecommendationType;
 import jervis.CommonTypes.MyDir;
+import jervis.CommonTypes.PerceivedAgent;
 import jervis.CommonTypes.Perception;
 import jervis.JasonLayer.Commands.*;
 
@@ -177,7 +178,12 @@ public class Controller {
 					}
 				} else if (r.recommendationType == RecommendationType.moveOrTurn || r.recommendationType == RecommendationType.move) {
 					Command move = new Move(r.dir);
-					if (state.simpleIsAlive || !move.getDestination(me).equals(state.enemyAgent)){
+					boolean blocking_detected = false;
+					for (PerceivedAgent e : state.enemyAgents) {
+						if(move.getDestination(me).equals(e))
+							blocking_detected = true;
+					}
+					if (!blocking_detected){
 						if(r.dir == me.direction ||  r.recommendationType == RecommendationType.move)
 							return move;
 						else

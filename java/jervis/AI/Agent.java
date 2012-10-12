@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-import jervis.Config;
 import jervis.AI.RecommendationEngines.*;
 import jervis.CommonTypes.Food;
 import jervis.CommonTypes.MyDir;
@@ -27,7 +26,7 @@ public class Agent {
 	public boolean otherTeamWasSeenEatingByMeLastTime = false;
 	public boolean doIComeAfterEnemy = false;
 	
-	private final Config config; 
+	
 	
 	@SuppressWarnings("serial")
 	List<RecommendationEngine> recommendationEngines = new ArrayList<RecommendationEngine>(){{
@@ -40,16 +39,16 @@ public class Agent {
 	
 	private static int orderCounter = 0;
 	
-    public Agent(String myName, Config config) {
-    	this.config = config;
+    public Agent(String myName) {
+    	
 		this.myName = myName;
 		this.order = orderCounter++;
-		this.energy = 20000/config.numOfJervis;
+		this.energy = 20000/Config.numOfJervis;
 	}
     
     public Agent(Agent original) {
     	this.doIComeAfterEnemy = original.doIComeAfterEnemy;
-    	this.config = original.config;
+    	
     	this.direction = original.direction;
     	this.position = (Point) original.position.clone();
     	this.order = original.order;
@@ -57,7 +56,7 @@ public class Agent {
 	}
 
 	public int getInternalTime(){
-    	return time*config.numOfJervis + order;
+    	return time*Config.numOfJervis + order;
     }
 
     private boolean debugOutputtedThisRound;	

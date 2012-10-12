@@ -10,7 +10,6 @@ import java.util.Random;
 import jason.architecture.AgArch;
 import jason.asSemantics.ActionExec;
 
-import jervis.Config;
 import jervis.AI.Debug.DebugFrame2;
 import jervis.AI.Debug.DebugToggle;
 import jervis.AI.RecommendationEngines.Recommendation;
@@ -32,14 +31,14 @@ public class Controller {
 	
 	private final Map<String, Agent> mapping = new HashMap<String, Agent>();
 	
-	public Controller(Config config) {
+	public Controller() {
 		if(DebugToggle.GUIENABLED){
 			debugFrame = new DebugFrame2();
 		}
-		state = new State(config);
+		state = new State();
 	}
 
-	public void process(Config config, Perception p, AgArch agArch) {		
+	public void process(Perception p, AgArch agArch) {		
 		if(DebugToggle.GUIENABLED){
 			state.debugInfo = new StringBuffer();
 			state.debugInfo.append("Agent #");
@@ -48,7 +47,7 @@ public class Controller {
 		}
 		
 		if(!mapping.containsKey(p.myname)){
-			Agent agent = new Agent(p.myname, config);
+			Agent agent = new Agent(p.myname);
 			mapping.put(p.myname, agent);
 			state.agentsInOrder[agent.order] = agent;
 		}
@@ -101,7 +100,7 @@ public class Controller {
 		
 		Stat.logCommand(agent, command);
 		
-		if(agent.order >= config.numOfJervis-1 && p.time == 14999){
+		if(agent.order >= Config.numOfJervis-1 && p.time == 14999){
 			for (String line: Stat.getSummary().split("\n")) {
 				System.out.println(line);
 			}

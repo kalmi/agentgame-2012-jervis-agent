@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-import jervis.Config;
 import jervis.AI.Utils.CircularArrayList;
 import jervis.CommonTypes.Food;
 import jervis.CommonTypes.PerceivedAgent;
@@ -27,12 +26,10 @@ public class State {
 	
 	public StringBuffer debugInfo = new StringBuffer();
 	
-	public final Config config;
 
 	
 
 	public State(State s){
-		this.config = s.config;
 		debugInfo.append(s.debugInfo);
 		
 		this.agentsInOrder = new Agent[s.agentsInOrder.length];
@@ -47,9 +44,8 @@ public class State {
 	}
 	
 	
-	public State(Config config) {
-		this.agentsInOrder = new Agent[config.numOfJervis];
-		this.config = config;
+	public State() {
+		this.agentsInOrder = new Agent[Config.numOfJervis];
 	}
 
 

@@ -10,7 +10,7 @@ public class SimpleEnergyWatcher {
 		
 		if(p.time > 1){
 			int otherTeamCollectiveEnergy = getOtherTeamEnergy(p, state);
-			if(otherTeamCollectiveEnergy<(state.config.numOfEnemy*100)) return false;
+			if(otherTeamCollectiveEnergy<(Config.numOfEnemy*100)) return false;
 			
 			Agent agent = state.getAgent(p.idFromName);
 			if(otherTeamCollectiveEnergyLastRound != null){

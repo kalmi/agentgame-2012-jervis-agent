@@ -27,9 +27,9 @@ public class WaterManager {
 				}
 				
 				if(p.mypos.x < waterTL.x) {
-					waterTL = new Point(p.mypos.x, waterTL.x);
+					waterTL = new Point(p.mypos.x, waterTL.y);
 				} else if(p.mypos.x > waterBR.x) {
-					waterBR = new Point(p.mypos.x, waterBR.x);
+					waterBR = new Point(p.mypos.x, waterBR.y);
 				}
 			}
 			determineWater();

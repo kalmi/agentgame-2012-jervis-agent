@@ -39,7 +39,9 @@ public class Controller {
 		state = new State();
 	}
 
-	public void process(Perception p, AgArch agArch) {		
+	public void process(Perception p, AgArch agArch) {
+		state.waterManager.report(p);
+		
 		if(DebugToggle.GUIENABLED){
 			state.debugInfo = new StringBuffer();
 			state.debugInfo.append("Agent #");
@@ -60,7 +62,7 @@ public class Controller {
 		/*System.out.println();
 		System.out.println(agent.myName);
 		System.out.println(agent.order);*/
-		
+				
 		state.processVisibleFoods(agent, p);
 		state.processEnemyAgents(agent, p);
 		

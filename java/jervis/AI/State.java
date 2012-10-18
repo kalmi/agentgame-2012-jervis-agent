@@ -27,6 +27,7 @@ public class State {
 	
 	public StringBuffer debugInfo = new StringBuffer();
 	
+	public WaterManager waterManager = new WaterManager();
 
 	
 

@@ -59,16 +59,20 @@ public class Agent {
     	return time*Config.numOfJervis + order;
     }
 
-    private boolean debugOutputtedThisRound;	
+    private boolean debugOutputtedThisRound;
+    private boolean silent;
     private void debug(String text){
-    	System.out.println("[" + Integer.toString(order) + ":"+ Integer.toString(time) +"] " + text);
-    	debugOutputtedThisRound = true;
+    	if(!silent){
+	    	System.out.println("[" + Integer.toString(order) + ":"+ Integer.toString(time) +"] " + text);
+	    	debugOutputtedThisRound = true;
+    	}
     }
     
     
     public void update(Perception p){
     	debugOutputtedThisRound = false;
     	time = p.time;
+    	silent = !(time > 1);
     	
     	/*if(p.idFromName != order){
     		id = p.idFromName;

@@ -24,27 +24,8 @@ public class State {
 	
 	public CircularArrayList<Integer> last4Consumption = new CircularArrayList<Integer>(4);
 	public CircularArrayList<Integer> last4NewSeen = new CircularArrayList<Integer>(4);
-	
-	public StringBuffer debugInfo = new StringBuffer();
-	
+
 	public WaterManager waterManager = new WaterManager();
-
-	
-
-	public State(State s){
-		debugInfo.append(s.debugInfo);
-		
-		this.agentsInOrder = new Agent[s.agentsInOrder.length];
-		
-		for (Food food : s.foods) {
-			foods.add(new Food(food));
-		}
-		
-		for (Agent original : s.agentsInOrder) {
-			agentsInOrder[original.order] = new Agent(original);
-		}
-	}
-	
 	
 	public State() {
 		this.agentsInOrder = new Agent[Config.numOfJervis];
@@ -89,11 +70,7 @@ public class State {
 	}
 
 	public Agent getAgent(int internalId) {
-		Agent agent = this.agentsInOrder[internalId];		
-		if(agent == null){
-			//agent = new Agent();
-			this.agentsInOrder[internalId] = agent;
-		}
+		Agent agent = this.agentsInOrder[internalId];
 		return agent;
 	}
 }

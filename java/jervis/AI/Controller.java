@@ -10,8 +10,6 @@ import java.util.Random;
 import jason.architecture.AgArch;
 import jason.asSemantics.ActionExec;
 
-import jervis.AI.Debug.DebugFrame2;
-import jervis.AI.Debug.DebugToggle;
 import jervis.AI.RecommendationEngines.Recommendation;
 import jervis.AI.RecommendationEngines.RecommendationEngine;
 import jervis.AI.RecommendationEngines.Recommendation.RecommendationType;
@@ -24,57 +22,34 @@ import jervis.JasonLayer.Commands.*;
 
 
 
-public class Controller {
+public class Controller {	
+	State state = new State();
 	
-	DebugFrame2 debugFrame;	
-	State state;
-	private Random random = new Random();
-	
-	private final Map<String, Agent> mapping = new HashMap<String, Agent>();
-	
-	public Controller() {
-		if(DebugToggle.GUIENABLED){
-			debugFrame = new DebugFrame2();
+	@SuppressWarnings("serial")
+	private final Map<String, Agent> mapping = new HashMap<String, Agent>(){
+		@Override
+		public Agent get(Object key){
+			Agent agent = super.get(key);
+			if(agent==null){
+				String name = (String)key;
+				agent = new Agent(name);
+				mapping.put(name, agent);
+				state.agentsInOrder[agent.order] = agent;
+			}
+			return agent;
 		}
-		state = new State();
-	}
+	};
+	
+	private Random random = new Random();
 
 	public void process(Perception p, AgArch agArch) {
-		state.waterManager.report(p);
-		
-		if(DebugToggle.GUIENABLED){
-			state.debugInfo = new StringBuffer();
-			state.debugInfo.append("Agent #");
-			state.debugInfo.append(p.idFromName);
-			state.debugInfo.append("\n\n");
-		}
-		
-		if(!mapping.containsKey(p.myname)){
-			Agent agent = new Agent(p.myname);
-			mapping.put(p.myname, agent);
-			state.agentsInOrder[agent.order] = agent;
-		}
-		
 		Agent agent = mapping.get(p.myname);
 		
-		agent.update(p);		
-		
-		/*System.out.println();
-		System.out.println(agent.myName);
-		System.out.println(agent.order);*/
-				
+		agent.update(p);				
+		state.waterManager.report(p);		
 		state.processVisibleFoods(agent, p);
-		state.processEnemyAgents(agent, p);
-		
-		
-		final boolean simpleAlive = SimpleEnergyWatcher.run(p, state);
-		
-		if(!simpleAlive && state.simpleIsAlive){
-			System.out.println("-Sir, our best friend is dead.");
-		} else if (simpleAlive && !state.simpleIsAlive) {
-			System.out.println("-Sir, I'm sensing a zombie.");
-		}
-		state.simpleIsAlive = simpleAlive;
+		state.processEnemyAgents(agent, p);		
+		state.simpleIsAlive = SimpleEnergyWatcher.run(p, state);
 
 		Command command = determineAppropiateCommandFor(agent);
 		
@@ -87,19 +62,6 @@ public class Controller {
 			System.out.println( "-Sir, this is not good: " + command.toString() + " failed." );
 		}
 		
-		
-		
-		
-		
-		
-		if(DebugToggle.GUIENABLED){
-			state.debugInfo.append("Decision: ");
-			state.debugInfo.append(command.toString());
-			state.debugInfo.append("\n");
-			state.debugInfo.append("\n");
-	
-			debugFrame.add(new State(state));
-		}
 		
 		Stat.logCommand(agent, command);
 		
@@ -120,11 +82,7 @@ public class Controller {
 				Command tmp = me.nextCommand;
 				me.nextCommand = null;
 				return tmp;
-			}
-			
-			if(DebugToggle.ENABLED){
-				state.debugInfo.append("  Recommendations:\n");
-			}
+			}		
 			
 			List<Recommendation> turnRecommendedness = new ArrayList<Recommendation>();
 			List<Recommendation> moveOrTurnRecommendedness = new ArrayList<Recommendation>();
@@ -140,11 +98,6 @@ public class Controller {
 						
 			for (RecommendationEngine engine : me.recommendationEngines) {
 				for (Recommendation r : engine.getRecommendation(state, me.order)) {
-					if(DebugToggle.ENABLED){
-						state.debugInfo.append("    ");
-						state.debugInfo.append(r.toString());
-						state.debugInfo.append("\n");
-					}
 					if(r.recommendationType == Recommendation.RecommendationType.moveOrTurn){
 						//turnRecommendedness[r.dir.ordinal()] += r.strength;
 						moveOrTurnRecommendedness.get(r.dir.ordinal()).add(r);
@@ -169,7 +122,7 @@ public class Controller {
 			Collections.reverse(recommendations);
 			
 			for (Recommendation r : recommendations) {
-				if(r.getStrength() <= 2) break;
+				//if(r.getStrength() <= 2) break;
 				
 				if(r.recommendationType == RecommendationType.turn){
 					if(r.dir == me.direction){

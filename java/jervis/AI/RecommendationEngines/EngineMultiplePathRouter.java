@@ -21,23 +21,23 @@ public class EngineMultiplePathRouter extends RecommendationEngine {
 	List<ArrayList<Point>> waypointsPerAgent = new ArrayList<ArrayList<Point>>(){{
 		
 		add(new ArrayList<Point>(){{
-			add(new Point(10,10));
+			add(new Point(30,10));
 		}});
 		
 		add(new ArrayList<Point>(){{
-			add(new Point(10,49));
+			add(new Point(10,30));
 		}});
 		
 		add(new ArrayList<Point>(){{
-			add(new Point(49,49));
+			add(new Point(49,30));
 		}});
 		
 		add(new ArrayList<Point>(){{
-			add(new Point(49,10));
+			add(new Point(30,49));
 		}});
 		
 		add(new ArrayList<Point>(){{
-			add(new Point(30,30));
+			add(new Point(31,31));
 		}});
 		
 	}};

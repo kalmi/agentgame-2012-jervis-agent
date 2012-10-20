@@ -122,7 +122,7 @@ public class Controller {
 			Collections.reverse(recommendations);
 			
 			for (Recommendation r : recommendations) {
-				//if(r.getStrength() <= 2) break;
+				if(r.getStrength() <= 2) break;
 				
 				if(r.recommendationType == RecommendationType.turn){
 					if(r.dir == me.direction){

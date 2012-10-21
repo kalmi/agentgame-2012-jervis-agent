@@ -153,50 +153,56 @@ public class Controller {
 	}
 	
 	private void replan(Agent me){
-		Point target = getCurrentWaypointTarget(me);
-		
-		if(isWaypointReached(me)){
-			waypointIdPerAgent[me.order] = (waypointIdPerAgent[me.order]+1) % waypointsPerAgent.get(me.order).size();
-			target = getCurrentWaypointTarget(me);
-		}
-		
 		boolean goingForFood = false;
-		if(state.foods.size() != 0){
-			Point closestFood = null;
-			int closestDistance = Integer.MAX_VALUE;
-			for (Point food : state.foods){
-				Agent closestToAgent = null;
-				int closestDistanceToAgent = Integer.MAX_VALUE;
-				
-				for (Agent otherAgent : state.agentsInOrder) {
-					if(otherAgent == null)
+		
+		Point target;
+		if(helper == me){
+			target = agentInNeed.position;
+		} else {
+			
+			target = getCurrentWaypointTarget(me);
+			
+			if(isWaypointReached(me)){
+				waypointIdPerAgent[me.order] = (waypointIdPerAgent[me.order]+1) % waypointsPerAgent.get(me.order).size();
+				target = getCurrentWaypointTarget(me);
+			}
+			
+			if(state.foods.size() != 0){
+				Point closestFood = null;
+				int closestDistance = Integer.MAX_VALUE;
+				for (Point food : state.foods){
+					Agent closestToAgent = null;
+					int closestDistanceToAgent = Integer.MAX_VALUE;
+					
+					for (Agent otherAgent : state.agentsInOrder) {
+						if(otherAgent == null)
+							continue;
+						
+						Agent a = otherAgent;
+						int d = Math.abs(food.x - a.position.x) + Math.abs(food.y - a.position.y);
+						if(closestDistanceToAgent > d){
+							closestDistanceToAgent = d;
+							closestToAgent = otherAgent;
+						}
+					}
+					
+					if(closestToAgent != me)
 						continue;
 					
-					Agent a = otherAgent;
-					int d = Math.abs(food.x - a.position.x) + Math.abs(food.y - a.position.y);
-					if(closestDistanceToAgent > d){
-						closestDistanceToAgent = d;
-						closestToAgent = otherAgent;
+					if(closestDistanceToAgent < closestDistance){
+						closestDistance = closestDistanceToAgent;
+						closestFood = food;
 					}
 				}
-				
-				if(closestToAgent != me)
-					continue;
-				
-				if(closestDistanceToAgent < closestDistance){
-					closestDistance = closestDistanceToAgent;
-					closestFood = food;
+				if(closestFood!=null){
+					target = closestFood;
+					goingForFood = true;
 				}
 			}
-			if(closestFood!=null){
-				target = closestFood;
-				goingForFood = true;
-			}
-		}
-		
+		}	
 		Planner planner = new Planner(me.position, target, state);
 		me.plan = planner.plan();
-		me.goingForFood = goingForFood;
+		me.goingForFood = goingForFood || helper == me;
 	}
 	
 	private void replanEverything(){
@@ -207,22 +213,57 @@ public class Controller {
 		}
 	}
 	
+	private Agent getHighestEnergyAgent(){
+		Agent agentWithHighestEnergy = null;
+		for (Agent agent : state.agentsInOrder) {
+			if(agentWithHighestEnergy == null || agent.energy>agentWithHighestEnergy.energy){
+				agentWithHighestEnergy = agent;
+			}
+		}
+		return agentWithHighestEnergy;
+	}
+	
+	Agent agentInNeed = null;
+	Agent helper = null;
+	
 	private Command determineAppropiateCommandFor(Agent me) {
 		if(me.onFood != null){
 			return new Eat(); 
 		} else {
 
+			if(helper == me && me.position.equals(agentInNeed.position)){
+				Command command = new Transfer(me, agentInNeed, me.energy/2);
+				agentInNeed.replanSceduled = true;
+				helper = null;
+				agentInNeed = null;
+				System.out.println("Thou shalt have my own!");
+				return command;
+			}
+			
+			if(me.energy < 5*Config.waterCostFactor){
+				if(agentInNeed==null){
+					agentInNeed = me;
+					System.out.println("AGENT IN NEED!");
+				}
+				return new Wait(); //don't move! help is coming...
+			}
+			
 			if(me.nextCommand != null){
 				me.replanSceduled = true;
 				Command tmp = me.nextCommand;
 				me.nextCommand = null;
 				return tmp;
 			}
-			
+						
 			boolean replanNeeded = false;
 			if(me.replanSceduled){
 				me.replanSceduled = false;
 				replanNeeded  = true;
+			}
+			
+			if(agentInNeed != null && helper == null && getHighestEnergyAgent() == me){
+				helper = me;
+				replanNeeded = true;
 			}
 			
 			if(me.time <= 5){

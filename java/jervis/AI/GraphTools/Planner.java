@@ -8,6 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
+
+import jervis.AI.Config;
 import jervis.AI.State;
 import jervis.AI.GraphTools.Planner.GraphProvider.Edge;
 import jervis.AI.GraphTools.Planner.GraphProvider.Vertex;
@@ -117,7 +119,7 @@ public class Planner {
 			public Vertex(int x, int y, double heuristic) {
 				super(x,y);
 				this.heuristic = heuristic; 
-				localEnergyUsage = state.waterManager.isWater(new Point(x,y)) ? 50 : 5;
+				localEnergyUsage = state.waterManager.isWater(new Point(x,y)) ? 5*Config.waterCostFactor : 5;
 			}
 
 			private ArrayList<Edge> getEdges() {

@@ -55,6 +55,7 @@ public class Agent {
 	public boolean goingForFood;
 	public boolean replanSceduled;
 	public int lastSuccessfulMove;
+	public int jasonId;
     private void debug(String text){
     	if(!silent){
 	    	System.out.println("[" + Integer.toString(order) + ":"+ Integer.toString(time) +"] " + text);
@@ -69,6 +70,8 @@ public class Agent {
     	silent = !(time > 1);
     	
     	inwater = p.inwater;
+    	
+    	this.jasonId = p.jasonId; 
     	/*if(p.idFromName != order){
     		id = p.idFromName;
 			debug("-Test complete. Preparing to power down and begin diagnostics..."); 

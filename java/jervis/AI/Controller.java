@@ -17,10 +17,6 @@ import jervis.CommonTypes.MyDir;
 import jervis.CommonTypes.Perception;
 import jervis.JasonLayer.Commands.*;
 
-
-
-
-
 public class Controller {	
 	State state = new State();
 	
@@ -42,10 +38,10 @@ public class Controller {
 	@SuppressWarnings("unused")
 	private Random random = new Random();
 
-	
+	private int obstaclesPrinted = 0;
 	public void process(Perception p, AgArch agArch) {
 		
-		if(p.myteamtimeleft<10 || state.omg__a_jervis_died_or_deadlocked){
+		if(p.myteamtimeleft<15 || state.omg__a_jervis_died_or_deadlocked){
 			Command command = new Wait();
 			ActionExec action = command.toAction();
 			agArch.act(action, null);
@@ -92,8 +88,11 @@ public class Controller {
 				//System.out.println(state.obstacles);
 				state.obstacles.add(obstacle);
 				state.foods.remove(destination);
-				//System.out.println(state.obstacles);
-				//System.out.println("---");
+				if(obstaclesPrinted<20){
+					obstaclesPrinted++;
+					System.out.println(state.obstacles);
+					System.out.println("---");
+				}
 				
 				if(agent.lastSuccessfulMove < agent.time - 500){
 					state.omg__a_jervis_died_or_deadlocked = true; 

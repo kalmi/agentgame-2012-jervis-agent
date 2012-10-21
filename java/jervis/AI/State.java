@@ -20,12 +20,25 @@ public class State {
 	public List<PerceivedAgent> enemyAgents;
 	public boolean simpleIsAlive = true;
 	
+	public boolean omg__a_jervis_died_or_deadlocked = false;
+	
 	public List<Food> foods = new ArrayList<Food>();
 	
 	public CircularArrayList<Integer> last4Consumption = new CircularArrayList<Integer>(4);
 	public CircularArrayList<Integer> last4NewSeen = new CircularArrayList<Integer>(4);
 
 	public WaterManager waterManager = new WaterManager();
+	
+	@SuppressWarnings("serial")
+	public class Obstacle extends Point{
+		public Obstacle(Point location, int exp) {
+			super(location);
+			expires = exp;
+		}
+
+		int expires;
+	}
+	public ArrayList<Obstacle> obstacles = new ArrayList<Obstacle>();
 	
 	public State() {
 		this.agentsInOrder = new Agent[Config.numOfJervis];
@@ -37,7 +50,7 @@ public class State {
 			for (int i=foods.size()-1;i>=0;i--){
 				Point food = foods.get(i);
 				if(perceiver.canSee(foods.get(i)) && !p.visibleFoods.contains(food)){
-					System.out.println("-Sir, MY COOOKIE IS GONE! http://www.youtube.com/watch?v=7enjABApKWE");
+					//System.out.println("-Sir, MY COOOKIE IS GONE! http://www.youtube.com/watch?v=7enjABApKWE");
 			    	foods.remove(i);
 				}
 			}
@@ -62,6 +75,7 @@ public class State {
 			for (PerceivedAgent otherAgent : p.visibleAgents) {
 				if(otherAgent.teamId != p.myteam){
 					list.add(otherAgent);
+					obstacles.add(new Obstacle(otherAgent, agent.time+5));
 					Stat.logSimpleSeen();
 				}
 			}

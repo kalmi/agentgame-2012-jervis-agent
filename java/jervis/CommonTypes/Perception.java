@@ -24,6 +24,7 @@ public class Perception {
 	public final int time;
 	public final int jasonId;
 	public final boolean inwater;
+	public final int myteamtimeleft;
 	 
 	static boolean enemyUsedBroadcast = false;
 	
@@ -39,7 +40,8 @@ public class Perception {
 		Integer myenergy = null;
 		Integer myTeamId = null;
 		Integer time = null;
-		Integer jasonId = null;
+		Integer myteamtimeleft = null;
+		Integer jasonId = null;		
 		boolean inwater = false;
 		
 		
@@ -100,7 +102,11 @@ public class Perception {
 				
 			case time:
 				time = BeliefParser.parseTime(item);
-				break;				
+				break;
+				
+			case myteamtimeleft:
+				myteamtimeleft = BeliefParser.parseTime(item);
+				break;
 
 			case inwater:
 				inwater = true;
@@ -126,6 +132,7 @@ public class Perception {
 		this.myenergy = myenergy;
 		this.myteam = myTeamId;
 		this.time = time;
+		this.myteamtimeleft = myteamtimeleft;
 		this.inwater = inwater;
 		
 

@@ -1,14 +1,13 @@
 package jervis.AI;
 
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 
-import jervis.AI.RecommendationEngines.*;
 import jervis.CommonTypes.Food;
 import jervis.CommonTypes.MyDir;
 import jervis.CommonTypes.Perception;
-import jervis.JasonLayer.Commands.Move;
+import jervis.JasonLayer.Commands.Command;
+
 
 
 public class Agent {
@@ -20,22 +19,12 @@ public class Agent {
 	public int energy;
 	public Food onFood = null;
 	public int time = 1;
+	public boolean inwater = false;
 	
-	public Move nextCommand = null;
+	public Command nextCommand = null;
 	
 	public boolean otherTeamWasSeenEatingByMeLastTime = false;
 	public boolean doIComeAfterEnemy = false;
-	
-	
-	
-	@SuppressWarnings("serial")
-	List<RecommendationEngine> recommendationEngines = new ArrayList<RecommendationEngine>(){{
-		add(new EngineFoodLiker(20000));
-		add(new EngineTurnOnEat(2000));
-		add(new EngineWallDisliker(200));
-		add(new EngineMultiplePathRouter(20));
-		add(new EngineAxisKeeperHack(2));	
-	}};
 	
 	private static int orderCounter = 0;
 	
@@ -61,6 +50,11 @@ public class Agent {
 
     private boolean debugOutputtedThisRound;
     private boolean silent;
+	public boolean lastCommandFailed = false;
+	public LinkedList<Point> plan;
+	public boolean goingForFood;
+	public boolean replanSceduled;
+	public int lastSuccessfulMove;
     private void debug(String text){
     	if(!silent){
 	    	System.out.println("[" + Integer.toString(order) + ":"+ Integer.toString(time) +"] " + text);
@@ -74,6 +68,7 @@ public class Agent {
     	time = p.time;
     	silent = !(time > 1);
     	
+    	inwater = p.inwater;
     	/*if(p.idFromName != order){
     		id = p.idFromName;
 			debug("-Test complete. Preparing to power down and begin diagnostics..."); 

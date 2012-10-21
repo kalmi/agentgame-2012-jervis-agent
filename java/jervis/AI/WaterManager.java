@@ -8,7 +8,7 @@ import jervis.CommonTypes.Perception;
 public class WaterManager {
 	//Boolean[][] a = new Boolean[60][60];
 	
-	Rectangle water = null;
+	Rectangle water = null;// new Rectangle(11, 6, 20, 100);
 	
 	Point waterTL = null;
 	Point waterBR = null;
@@ -37,8 +37,8 @@ public class WaterManager {
 	}
 
 	private void determineWater() {
-		water = new Rectangle(waterTL.x, waterTL.y, waterBR.x-waterTL.x, waterBR.y-waterTL.y);
-		System.out.println(water);
+		water = new Rectangle(waterTL.x, waterTL.y, waterBR.x-waterTL.x+1, waterBR.y-waterTL.y+1);
+		//System.out.println(water);
 	}
 	
 	public boolean isWater(Point x){

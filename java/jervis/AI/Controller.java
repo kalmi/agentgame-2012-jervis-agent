@@ -1,7 +1,7 @@
 package jervis.AI;
 
+import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,11 +10,10 @@ import java.util.Random;
 import jason.architecture.AgArch;
 import jason.asSemantics.ActionExec;
 
-import jervis.AI.RecommendationEngines.Recommendation;
-import jervis.AI.RecommendationEngines.RecommendationEngine;
-import jervis.AI.RecommendationEngines.Recommendation.RecommendationType;
+
+import jervis.AI.State.Obstacle;
+import jervis.AI.GraphTools.Planner;
 import jervis.CommonTypes.MyDir;
-import jervis.CommonTypes.PerceivedAgent;
 import jervis.CommonTypes.Perception;
 import jervis.JasonLayer.Commands.*;
 
@@ -40,9 +39,19 @@ public class Controller {
 		}
 	};
 	
+	@SuppressWarnings("unused")
 	private Random random = new Random();
 
+	
 	public void process(Perception p, AgArch agArch) {
+		
+		if(p.myteamtimeleft<10 || state.omg__a_jervis_died_or_deadlocked){
+			Command command = new Wait();
+			ActionExec action = command.toAction();
+			agArch.act(action, null);
+			return;
+		}
+		
 		Agent agent = mapping.get(p.myname);
 		
 		agent.update(p);				
@@ -51,6 +60,14 @@ public class Controller {
 		state.processEnemyAgents(agent, p);		
 		state.simpleIsAlive = SimpleEnergyWatcher.run(p, state);
 
+		
+		ArrayList<Obstacle> toRemove = new ArrayList<State.Obstacle>();
+		for (Obstacle o : state.obstacles) {
+			if(o.expires<=agent.time)
+				toRemove.add(o);
+		}		
+		state.obstacles.removeAll(toRemove);
+		
 		Command command = determineAppropiateCommandFor(agent);
 		
 		ActionExec action = command.toAction();
@@ -58,140 +75,217 @@ public class Controller {
 		
 		if(action.getResult() == true){
 			command.pretend(agent, state);
+			agent.lastCommandFailed = false;
+			
+			if(command instanceof Move){
+				agent.plan.removeFirst();
+				agent.lastSuccessfulMove = agent.time;
+			}
 		} else {
-			System.out.println( "-Sir, this is not good: " + command.toString() + " failed." );
+			agent.lastCommandFailed = true;
+			//System.out.println( "-Sir, this is not good: " + command.toString() + " failed." );
+			if(command instanceof Move){
+				Move lastMove = (Move)command;
+				agent.replanSceduled = true;
+				Point destination = lastMove.getDestination(agent);
+				Obstacle obstacle = state.new Obstacle(destination, agent.time+5);
+				//System.out.println(state.obstacles);
+				state.obstacles.add(obstacle);
+				//System.out.println(state.obstacles);
+				//System.out.println("---");
+				
+				if(agent.lastSuccessfulMove < agent.time - 500){
+					state.omg__a_jervis_died_or_deadlocked = true; 
+				}
+			}
 		}
 		
 		
 		Stat.logCommand(agent, command);
-		
+		/*
 		if(agent.order >= Config.numOfJervis-1 && p.time == 14999){
 			for (String line: Stat.getSummary().split("\n")) {
 				System.out.println(line);
-			}
-			
-		}
+			}			
+		}*/
 		
 	}
 
+	int[] waypointIdPerAgent = new int[5];
+	
+	@SuppressWarnings("serial")
+	List<ArrayList<Point>> waypointsPerAgent = new ArrayList<ArrayList<Point>>(){{
+		
+		add(new ArrayList<Point>(){{
+			add(new Point(10,10));
+			add(new Point(28,10));
+		}});
+		
+		add(new ArrayList<Point>(){{
+			add(new Point(10,49));
+			add(new Point(10,31));
+		}});
+		
+		add(new ArrayList<Point>(){{
+			add(new Point(49,49));
+			add(new Point(31,49));
+		}});
+		
+		add(new ArrayList<Point>(){{
+			add(new Point(49,10));
+			add(new Point(49,28));
+		}});
+		
+		add(new ArrayList<Point>(){{
+			add(new Point(30,30));
+		}});
+		
+	}};	
+	
+	private Point getCurrentWaypointTarget(Agent me){
+		return waypointsPerAgent.get(me.order).get(waypointIdPerAgent[me.order]);
+	}
+	
+	private boolean isWaypointReached(Agent me){
+		Point target = getCurrentWaypointTarget(me);
+		return (target.equals(me.position) || (me.lastCommandFailed && me.position.distance(target) < 2.1));
+	}
+	
+	private void replan(Agent me){
+		Point target = getCurrentWaypointTarget(me);
+		
+		if(isWaypointReached(me)){
+			waypointIdPerAgent[me.order] = (waypointIdPerAgent[me.order]+1) % waypointsPerAgent.get(me.order).size();
+			target = getCurrentWaypointTarget(me);
+		}
+		
+		boolean goingForFood = false;
+		if(state.foods.size() != 0){
+			Point closestFood = null;
+			int closestDistance = Integer.MAX_VALUE;
+			for (Point food : state.foods){
+				Agent closestToAgent = null;
+				int closestDistanceToAgent = Integer.MAX_VALUE;
+				
+				for (Agent otherAgent : state.agentsInOrder) {
+					if(otherAgent == null)
+						continue;
+					
+					Agent a = otherAgent;
+					int d = Math.abs(food.x - a.position.x) + Math.abs(food.y - a.position.y);
+					if(closestDistanceToAgent > d){
+						closestDistanceToAgent = d;
+						closestToAgent = otherAgent;
+					}
+				}
+				
+				if(closestToAgent != me)
+					continue;
+				
+				if(closestDistanceToAgent < closestDistance){
+					closestDistance = closestDistanceToAgent;
+					closestFood = food;
+				}
+			}
+			if(closestFood!=null){
+				target = closestFood;
+				goingForFood = true;
+			}
+		}
+		
+		Planner planner = new Planner(me.position, target, state);
+		me.plan = planner.plan();
+		me.goingForFood = goingForFood;
+	}
+	
+	private void replanEverything(){
+		for (Agent me : state.agentsInOrder) {
+			if(me==null) continue;
+			
+			replan(me);
+		}
+	}
+	
 	private Command determineAppropiateCommandFor(Agent me) {
 		if(me.onFood != null){
-			return new Eat();		
+			return new Eat(); 
 		} else {
+
 			if(me.nextCommand != null){
+				me.replanSceduled = true;
 				Command tmp = me.nextCommand;
 				me.nextCommand = null;
 				return tmp;
-			}		
-			
-			List<Recommendation> turnRecommendedness = new ArrayList<Recommendation>();
-			List<Recommendation> moveOrTurnRecommendedness = new ArrayList<Recommendation>();
-			List<Recommendation> moveRecommendedness = new ArrayList<Recommendation>();
-			
-			for (MyDir d : MyDir.values()) {
-				turnRecommendedness.add(new Recommendation(0, RecommendationType.turn, d));
-				moveOrTurnRecommendedness.add(new Recommendation(0, RecommendationType.moveOrTurn, d));
-				moveRecommendedness.add(new Recommendation(0, RecommendationType.move, d));
 			}
 			
+			boolean replanNeeded = false;
+			if(me.replanSceduled){
+				me.replanSceduled = false;
+				replanNeeded  = true;
+			}
 			
+			if(me.time <= 5){
+				replanNeeded  = true;
+			}
+			
+			int lastConsumedAt = state.last4Consumption.isEmpty()? Integer.MIN_VALUE : state.last4Consumption.getNewest();
+			if(lastConsumedAt >= me.getInternalTime() - Config.numOfAll){
+				replanNeeded  = true;
+			}
+			
+			if(isWaypointReached(me)){
+				replanNeeded  = true;
+			}
+			
+			if(replanNeeded){
+				replanEverything();
+			}
+			
+			if(!me.goingForFood){
+				if(lastConsumedAt >= me.getInternalTime() - 3*6){
+					return new Turn(me.direction.cwNext());
+				}
+			}			
 						
-			for (RecommendationEngine engine : me.recommendationEngines) {
-				for (Recommendation r : engine.getRecommendation(state, me.order)) {
-					if(r.recommendationType == Recommendation.RecommendationType.moveOrTurn){
-						//turnRecommendedness[r.dir.ordinal()] += r.strength;
-						moveOrTurnRecommendedness.get(r.dir.ordinal()).add(r);
-						moveRecommendedness.get(r.dir.ordinal()).add(r, 0.5);
-						turnRecommendedness.get(r.dir.ordinal()).add(r, 0.5);
-					} else if(r.recommendationType == Recommendation.RecommendationType.turn){
-						turnRecommendedness.get(r.dir.ordinal()).add(r);
-					} else if(r.recommendationType == Recommendation.RecommendationType.move){
-						moveRecommendedness.get(r.dir.ordinal()).add(r);
-						moveOrTurnRecommendedness.get(r.dir.ordinal()).add(r, 0.5);
-					}	
-				}
-			}
-		
-			
-			List<Recommendation> recommendations = new ArrayList<Recommendation>();
-			recommendations.addAll(moveOrTurnRecommendedness);
-			recommendations.addAll(turnRecommendedness);
-			recommendations.addAll(moveRecommendedness);
-			
-			Collections.sort(recommendations);
-			Collections.reverse(recommendations);
-			
-			for (Recommendation r : recommendations) {
-				if(r.getStrength() <= 2) break;
+			if(me.plan == null || me.plan.size() == 1 ||
+					(isWaypointReached(me) &&
+							(state.enemyAgents.contains(getCurrentWaypointTarget(me)) ||
+							state.obstacles.contains(getCurrentWaypointTarget(me)))       )){
+				return new Wait();
+			} else {
+				Point nextPoint = me.plan.get(1);
 				
-				if(r.recommendationType == RecommendationType.turn){
-					if(r.dir == me.direction){
-						System.out.println("-Sir, you are dumb. We are already facing that way.");
-						continue;
-					} else {
-						return new Turn(r.dir);
-					}
-				} else if (r.recommendationType == RecommendationType.moveOrTurn || r.recommendationType == RecommendationType.move) {
-					Command move = new Move(r.dir);
-					boolean blocking_detected = false;
-					for (PerceivedAgent e : state.enemyAgents) {
-						if(move.getDestination(me).equals(e))
-							blocking_detected = true;
-					}
-					if (!blocking_detected){
-						if(r.dir == me.direction ||  r.recommendationType == RecommendationType.move)
-							return move;
-						else
-							return new Turn(r.dir);
-					} else {
-						Command currentCommand;
-						if(me.position.x == 0 && (r.dir == MyDir.up || r.dir == MyDir.down)){
-							currentCommand = new Move(MyDir.right);
-							me.nextCommand = new Move(r.dir);
-						} else
-						if(me.position.x == 59 && (r.dir == MyDir.up || r.dir == MyDir.down)){
-							currentCommand = new Move(MyDir.left);
-							me.nextCommand = new Move(r.dir);
-						} else
-						if(me.position.y == 0 && (r.dir == MyDir.left || r.dir == MyDir.right)){
-							currentCommand = new Move(MyDir.down);
-							me.nextCommand = new Move(r.dir);
-						} else
-						if(me.position.y == 59 && (r.dir == MyDir.left || r.dir == MyDir.right)){
-							currentCommand = new Move(MyDir.up);
-							me.nextCommand = new Move(r.dir);
-						}else
-						if (r.dir == MyDir.up || r.dir == MyDir.down){
-							MyDir firstDir;
-							if(random.nextBoolean()){
-								firstDir = MyDir.left;
-							} else {
-								firstDir = MyDir.right;
-							}
-							
-							currentCommand = new Move(firstDir);
-							me.nextCommand = new Move(r.dir);
-						}else
-						if (r.dir == MyDir.left || r.dir == MyDir.right){
-							MyDir firstDir;
-							if(random.nextBoolean()){
-								firstDir = MyDir.up;
-							} else {
-								firstDir = MyDir.down;
-							}
-							
-							currentCommand = new Move(firstDir);
-							me.nextCommand = new Move(r.dir);
-						}else{
-							throw new RuntimeException();
-						}
-						return currentCommand;
-					}
-				}
-			}
-			
-			return new Wait();
+				/*if(state.enemyAgents.contains(nextPoint)){
+					replanNeeded = true;
+					return new Wait();
+				}*/
 
+				MyDir dir = null;
+				if(nextPoint.x>me.position.x){
+					dir = MyDir.right;
+				}
+				if(nextPoint.x<me.position.x){
+					dir = MyDir.left;
+				}
+				if(nextPoint.y>me.position.y){
+					dir = MyDir.down;
+				}
+				if(nextPoint.y<me.position.y){
+					dir = MyDir.up;
+				}
+				
+				if(me.goingForFood){
+					return new Move(dir);
+				} else {
+					if(me.direction != dir)
+						return new Turn(dir);
+					else
+						return new Move(dir);
+				}
+				
+				
+			}
 		}
 	}
+	
 }

@@ -3,11 +3,12 @@ package jervis.JasonLayer.Commands;
 import java.awt.Point;
 
 import jervis.AI.Agent;
+import jervis.AI.Config;
 import jervis.AI.State;
 import jervis.CommonTypes.MyDir;
 
 public class Move extends Command {
-	final private MyDir dir; 
+	final public MyDir dir; 
 	
 	public Move(MyDir dir){
 		this.actionType = Action.step;
@@ -36,7 +37,7 @@ public class Move extends Command {
 				break;						
 			}
 			
-			agent.energy -= 5;
+			agent.energy -= 5 * (agent.inwater? Config.waterCostFactor : 1);
 		}
 	}
 	

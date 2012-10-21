@@ -26,7 +26,7 @@ public class Perception {
 	public final boolean inwater;
 	public final int myteamtimeleft;
 	 
-	static boolean enemyUsedBroadcast = false;
+	static boolean broadcastWarningDone = false;  
 	
 	public Perception(BeliefBase bb) {
 	
@@ -47,15 +47,19 @@ public class Perception {
 		
 		Iterator<Literal> iter = bb.iterator();
 		List<Literal> toBeRemoved = new ArrayList<Literal>();
+		
+		
 		while (iter.hasNext()) {
 			Literal item = iter.next();
 			LiteralType type;
 			try{
 				type = LiteralType.valueOf(item.getFunctor());
 			} catch (IllegalArgumentException e){
-				enemyUsedBroadcast = true;
 				toBeRemoved.add(item);
-				//System.out.println("-Sir, I cannot recognize the following belief: " + item.getFunctor());
+				if(broadcastWarningDone == false){
+					System.out.println("-Sir, the enemy is not playing fair. He used broadcast. Functor: " + item.getFunctor());
+					broadcastWarningDone = true;
+				}
 				continue;
 			}
 

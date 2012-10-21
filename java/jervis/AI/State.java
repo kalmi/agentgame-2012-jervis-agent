@@ -29,16 +29,13 @@ public class State {
 
 	public WaterManager waterManager = new WaterManager();
 	
-	@SuppressWarnings("serial")
-	public class Obstacle extends Point{
-		public Obstacle(Point location, int exp) {
-			super(location);
-			expires = exp;
-		}
-
-		int expires;
+	public int[][] obstacleTimes = new int[60][60];
+	
+	public boolean isObstacle(Agent me, Point point){
+		int t = obstacleTimes[point.x][point.y];
+		int expires = t + 5;
+		return  !(expires <= me.time);
 	}
-	public ArrayList<Obstacle> obstacles = new ArrayList<Obstacle>();
 	
 	public State() {
 		this.agentsInOrder = new Agent[Config.numOfJervis];
@@ -75,7 +72,7 @@ public class State {
 			for (PerceivedAgent otherAgent : p.visibleAgents) {
 				if(otherAgent.teamId != p.myteam){
 					list.add(otherAgent);
-					obstacles.add(new Obstacle(otherAgent, agent.time+5));
+					obstacleTimes[otherAgent.x][otherAgent.y] = agent.time;  
 					Stat.logSimpleSeen();
 				}
 			}

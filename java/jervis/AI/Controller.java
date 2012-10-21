@@ -10,8 +10,6 @@ import java.util.Random;
 import jason.architecture.AgArch;
 import jason.asSemantics.ActionExec;
 
-
-import jervis.AI.State.Obstacle;
 import jervis.AI.GraphTools.Planner;
 import jervis.CommonTypes.MyDir;
 import jervis.CommonTypes.Perception;
@@ -38,7 +36,6 @@ public class Controller {
 	@SuppressWarnings("unused")
 	private Random random = new Random();
 
-	private int obstaclesPrinted = 0;
 	public void process(Perception p, AgArch agArch) {
 		
 		if(p.myteamtimeleft<15 || state.omg__a_jervis_died_or_deadlocked){
@@ -55,14 +52,6 @@ public class Controller {
 		state.processVisibleFoods(agent, p);
 		state.processEnemyAgents(agent, p);		
 		state.simpleIsAlive = SimpleEnergyWatcher.run(p, state);
-
-		
-		ArrayList<Obstacle> toRemove = new ArrayList<State.Obstacle>();
-		for (Obstacle o : state.obstacles) {
-			if(o.expires<=agent.time)
-				toRemove.add(o);
-		}		
-		state.obstacles.removeAll(toRemove);
 		
 		Command command = determineAppropiateCommandFor(agent);
 		
@@ -84,15 +73,8 @@ public class Controller {
 				Move lastMove = (Move)command;
 				agent.replanSceduled = true;
 				Point destination = lastMove.getDestination(agent);
-				Obstacle obstacle = state.new Obstacle(destination, agent.time+5);
-				//System.out.println(state.obstacles);
-				state.obstacles.add(obstacle);
+				state.obstacleTimes[destination.x][destination.y] = agent.time;  
 				state.foods.remove(destination);
-				if(obstaclesPrinted<20){
-					obstaclesPrinted++;
-					System.out.println(state.obstacles);
-					System.out.println("---");
-				}
 				
 				if(agent.lastSuccessfulMove < agent.time - 500){
 					state.omg__a_jervis_died_or_deadlocked = true; 
@@ -199,7 +181,7 @@ public class Controller {
 				}
 			}
 		}	
-		Planner planner = new Planner(me.position, target, state);
+		Planner planner = new Planner(me.position, target, state, me);
 		me.plan = planner.plan();
 		me.goingForFood = goingForFood || helper == me;
 	}
@@ -291,7 +273,7 @@ public class Controller {
 			if(me.plan == null || me.plan.size() == 1 ||
 					(isWaypointReached(me) &&
 							(state.enemyAgents.contains(getCurrentWaypointTarget(me)) ||
-							state.obstacles.contains(getCurrentWaypointTarget(me)))       )){
+							state.isObstacle(me, getCurrentWaypointTarget(me)))       )){
 				return new Wait();
 			} else {
 				Point nextPoint = me.plan.get(1);

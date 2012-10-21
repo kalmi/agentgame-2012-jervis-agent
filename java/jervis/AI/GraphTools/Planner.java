@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
 
+import jervis.AI.Agent;
 import jervis.AI.Config;
 import jervis.AI.State;
 import jervis.AI.GraphTools.Planner.GraphProvider.Edge;
@@ -19,10 +20,12 @@ public class Planner {
 	final State state;	
 	final Point start;
 	final Point target;
-	public Planner(Point start, Point target, State state){
+	final Agent agent;
+	public Planner(Point start, Point target, State state, Agent agent){
 		this.start = start;
 		this.target = target;
 		this.state = state;
+		this.agent = agent;
 	}
 		
 	
@@ -127,7 +130,7 @@ public class Planner {
 				if(x-1 >= 0){
 					Point p = new Point(x-1,y);
 					Vertex v = getVertex(p);
-					boolean enemyPresent = state.obstacles.contains(p);
+					boolean enemyPresent = state.isObstacle(agent, p);
 					boolean edgy = p.x < 10 || p.y < 10 || p.y > 49 || p.x > 49;
 					Edge e = new Edge(v, v.localEnergyUsage + (enemyPresent?1000:0) + (edgy?0.1:0));
 					l.add(e);
@@ -136,7 +139,7 @@ public class Planner {
 				if(x+1 < 60){
 					Point p = new Point(x+1,y);
 					Vertex v = getVertex(p);
-					boolean enemyPresent = state.obstacles.contains(p);
+					boolean enemyPresent = state.isObstacle(agent, p);
 					boolean edgy = p.x < 10 || p.y < 10 || p.y > 49 || p.x > 49;
 					Edge e = new Edge(v, v.localEnergyUsage + (enemyPresent?1000:0) + (edgy?0.1:0));
 					l.add(e);
@@ -145,7 +148,7 @@ public class Planner {
 				if(y-1 >= 0){
 					Point p = new Point(x,y-1);
 					Vertex v = getVertex(p);
-					boolean enemyPresent = state.obstacles.contains(p);
+					boolean enemyPresent = state.isObstacle(agent, p);
 					boolean edgy = p.x < 10 || p.y < 10 || p.y > 49 || p.x > 49;
 					Edge e = new Edge(v, v.localEnergyUsage + (enemyPresent?1000:0) + (edgy?0.1:0));
 					l.add(e);
@@ -154,7 +157,7 @@ public class Planner {
 				if(y+1 < 60){
 					Point p = new Point(x,y+1);
 					Vertex v = getVertex(p);
-					boolean enemyPresent = state.obstacles.contains(p);
+					boolean enemyPresent = state.isObstacle(agent, p);
 					boolean edgy = p.x < 10 || p.y < 10 || p.y > 49 || p.x > 49;
 					Edge e = new Edge(v, v.localEnergyUsage + (enemyPresent?1000:0) + (edgy?0.1:0));
 					l.add(e);

@@ -91,6 +91,7 @@ public class Controller {
 				Obstacle obstacle = state.new Obstacle(destination, agent.time+5);
 				//System.out.println(state.obstacles);
 				state.obstacles.add(obstacle);
+				state.foods.remove(destination);
 				//System.out.println(state.obstacles);
 				//System.out.println("---");
 				

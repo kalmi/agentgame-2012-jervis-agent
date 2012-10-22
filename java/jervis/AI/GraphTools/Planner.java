@@ -17,6 +17,8 @@ import jervis.AI.GraphTools.Planner.GraphProvider.Vertex;
 
 public class Planner {
 	
+	static int kifejtve = 0;
+	
 	final State state;	
 	final Point start;
 	final Point target;
@@ -26,6 +28,9 @@ public class Planner {
 		this.target = target;
 		this.state = state;
 		this.agent = agent;
+		
+		if(agent.time % 100 == 0 && agent.order == 0)
+			System.out.println((double)kifejtve / agent.time );
 	}
 	
 	public static int compareInt(int x, int y) {
@@ -49,6 +54,7 @@ public class Planner {
 		
 		while(!openListInProcessingOrder.isEmpty()){
 			Vertex current = openListInProcessingOrder.remove();
+			kifejtve++;
 			closed.add(current);
 			if(target.equals(current)){
 				Path path = new Path();

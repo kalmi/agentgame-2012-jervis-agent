@@ -45,7 +45,7 @@ public class Controller {
 						
 			double estimated_required_time = time_per_round * rounds_left;
 			
-			if(estimated_required_time + safetyMargin > time_left && p.time > 1000){
+			if(time_left < 80 && estimated_required_time + safetyMargin > time_left && p.time > 1000){
 				int N = 250;
 				System.out.print("Round #");
 				System.out.println(p.time);

@@ -306,6 +306,8 @@ public class Controller {
 							state.isObstacle(me, getCurrentWaypointTarget(me)))       )){
 				return new Wait();
 			} else {
+				if(!me.plan.get(0).equals(me.position))
+					System.out.println("Plan non-aghfgsdhkgsdhkhgkdj!");
 				Point nextPoint = me.plan.get(1);
 				
 				/*if(state.enemyAgents.contains(nextPoint)){

@@ -73,7 +73,7 @@ public class Controller {
 		Agent agent = mapping.get(p.myname);
 		
 		agent.update(p);				
-		state.waterManager.report(p);		
+		state.waterManager.report(agent, p);
 		state.processVisibleFoods(agent, p);
 		state.processEnemyAgents(agent, p);		
 		state.simpleIsAlive = SimpleEnergyWatcher.run(p, state);

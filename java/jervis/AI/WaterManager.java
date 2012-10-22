@@ -13,7 +13,7 @@ public class WaterManager {
 	Point waterTL = null;
 	Point waterBR = null;
 	
-	public void report(Perception p){
+	public void report(Agent agent, Perception p){
 		//a[p.mypos.x][p.mypos.y] = p.inwater;
 		if(p.inwater){
 			if(water == null){
@@ -22,14 +22,18 @@ public class WaterManager {
 			} else{
 				if(p.mypos.y < waterTL.y) {
 					waterTL = new Point(waterTL.x, p.mypos.y);
+					agent.replanSceduled = true;
 				} else if(p.mypos.y > waterBR.y) {
 					waterBR = new Point(waterBR.x, p.mypos.y);
+					agent.replanSceduled = true;
 				}
 				
 				if(p.mypos.x < waterTL.x) {
 					waterTL = new Point(p.mypos.x, waterTL.y);
+					agent.replanSceduled = true;
 				} else if(p.mypos.x > waterBR.x) {
 					waterBR = new Point(p.mypos.x, waterBR.y);
+					agent.replanSceduled = true;
 				}
 			}
 			determineWater();

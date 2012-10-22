@@ -63,14 +63,14 @@ public class Controller {
 			}
 		}
 		
-		if(playDeadTill > p.time || state.omg__a_jervis_died_or_deadlocked){
+		Agent agent = mapping.get(p.myname);
+		
+		if((playDeadTill > p.time && !agent.goingForFood) || state.omg__a_jervis_died_or_deadlocked){
 			Command command = new Wait();
 			ActionExec action = command.toAction();
 			agArch.act(action, null);
 			return;
 		}
-		
-		Agent agent = mapping.get(p.myname);
 		
 		agent.update(p);				
 		state.waterManager.report(agent, p);

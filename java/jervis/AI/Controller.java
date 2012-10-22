@@ -281,6 +281,11 @@ public class Controller {
 				replanNeeded  = true;
 			}
 			
+			int lastNewSeen = state.last4NewSeen.isEmpty()? Integer.MIN_VALUE : state.last4NewSeen.getNewest();
+			if(lastNewSeen == me.getInternalTime()){
+				replanNeeded = true;
+			}
+			
 			if(isWaypointReached(me)){
 				replanNeeded  = true;
 			}

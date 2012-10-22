@@ -29,6 +29,12 @@ public class Planner {
 		this.state = state;
 		this.agent = agent;
 		
+		if(agent.hightlighted){
+			System.out.println();
+			System.out.print("Replan for ");
+			System.out.println(agent.myName);
+		}
+		
 		if(agent.time % 100 == 0 && agent.order == 0)
 			System.out.println((double)kifejtve / agent.time );
 	}

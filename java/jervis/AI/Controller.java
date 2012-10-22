@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import jason.architecture.AgArch;
 import jason.asSemantics.ActionExec;
@@ -32,13 +31,39 @@ public class Controller {
 			return agent;
 		}
 	};
-	
-	@SuppressWarnings("unused")
-	private Random random = new Random();
 
+	int playDeadTill = 0; 
 	public void process(Perception p, AgArch agArch) {
+		if(p.time > 1000 && state.agentsInOrder[0].jasonId == p.jasonId && playDeadTill < p.time){
+			int safetyMargin = 2;
+			
+			int time_used = 120 - p.myteamtimeleft;
+			double time_per_round = ((double)time_used) / p.time;
+			
+			int rounds_left = 15000 - p.time;			
+			int time_left = 120 - time_used;
+						
+			double estimated_required_time = time_per_round * rounds_left;
+			
+			if(estimated_required_time + safetyMargin > time_left && p.time > 1000){
+				int N = 250;
+				System.out.print("Round #");
+				System.out.println(p.time);
+				System.out.print("Estimated required time: " );
+				System.out.println(estimated_required_time);
+				System.out.print("We have: " );
+				System.out.println(time_left);
+				System.out.println("ZZZZZZZZZzzzzzzzzzzzzzz!");
+				System.out.println("---");
+				playDeadTill = p.time + N;
+				
+				for (Agent agent : state.agentsInOrder) {
+					agent.lastSuccessfulMove += N;
+				}
+			}
+		}
 		
-		if(p.myteamtimeleft<15 || state.omg__a_jervis_died_or_deadlocked){
+		if(playDeadTill > p.time || state.omg__a_jervis_died_or_deadlocked){
 			Command command = new Wait();
 			ActionExec action = command.toAction();
 			agArch.act(action, null);

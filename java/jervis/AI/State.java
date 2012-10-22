@@ -20,8 +20,6 @@ public class State {
 	public List<PerceivedAgent> enemyAgents;
 	public boolean simpleIsAlive = true;
 	
-	public boolean omg__a_jervis_died_or_deadlocked = false;
-	
 	public List<Food> foods = new ArrayList<Food>();
 	
 	public final CircularArrayList<Integer> last4Consumption = new CircularArrayList<Integer>(4);

@@ -65,7 +65,7 @@ public class Controller {
 		
 		Agent agent = mapping.get(p.myname);
 		
-		if((playDeadTill > p.time && !agent.goingForFood) || state.omg__a_jervis_died_or_deadlocked){
+		if((playDeadTill > p.time && !agent.goingForFood)){
 			Command command = new Wait();
 			ActionExec action = command.toAction();
 			agArch.act(action, null);
@@ -100,10 +100,6 @@ public class Controller {
 				Point destination = lastMove.getDestination(agent);
 				state.obstacleTimes[destination.x][destination.y] = agent.time;  
 				state.foods.remove(destination);
-				
-				if(agent.lastSuccessfulMove < agent.time - 500){
-					state.omg__a_jervis_died_or_deadlocked = true; 
-				}
 			}
 		}
 		
@@ -300,12 +296,12 @@ public class Controller {
 				}
 			}			
 			
-			state.waterManager.pretendThatThereIsNoWater = !(lastNewSeen+50 > me.time && lastConsumedAt+50 > me.time);
+			boolean doWeGetToEat = lastNewSeen+50 > me.time || lastConsumedAt+50 > me.time;
+			state.waterManager.pretendThatThereIsNoWater =  !doWeGetToEat && !state.last4NewSeen.isEmpty();
 			if(state.waterManager.pretendThatThereIsNoWater && !pretendNotificationDone){
 				System.out.println("OMG... My algorithm is a bit retarded.");
 				pretendNotificationDone = true;
 			}
-			
 			if(me.plan == null || me.plan.size() == 1 ||
 					(isWaypointReached(me) &&
 							(state.enemyAgents.contains(getCurrentWaypointTarget(me)) ||

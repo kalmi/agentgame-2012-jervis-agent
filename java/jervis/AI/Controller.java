@@ -231,12 +231,12 @@ public class Controller {
 	
 	Agent agentInNeed = null;
 	Agent helper = null;
+	boolean pretendNotificationDone = false;
 	
 	private Command determineAppropiateCommandFor(Agent me) {
 		if(me.onFood != null){
 			return new Eat(); 
 		} else {
-
 			if(helper == me && me.position.equals(agentInNeed.position)){
 				Command command = new Transfer(me, agentInNeed, me.energy/2);
 				agentInNeed.replanSceduled = true;
@@ -299,7 +299,13 @@ public class Controller {
 					return new Turn(me.direction.cwNext());
 				}
 			}			
-						
+			
+			state.waterManager.pretendThatThereIsNoWater = !(lastNewSeen+50 > me.time && lastConsumedAt+50 > me.time);
+			if(state.waterManager.pretendThatThereIsNoWater && !pretendNotificationDone){
+				System.out.println("OMG... My algorithm is a bit retarded.");
+				pretendNotificationDone = true;
+			}
+			
 			if(me.plan == null || me.plan.size() == 1 ||
 					(isWaypointReached(me) &&
 							(state.enemyAgents.contains(getCurrentWaypointTarget(me)) ||

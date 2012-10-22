@@ -8,11 +8,20 @@ import jervis.CommonTypes.Perception;
 public class WaterManager {
 	//Boolean[][] a = new Boolean[60][60];
 	
-	Rectangle water = null;// new Rectangle(11, 6, 20, 100);
+	private Rectangle water = null;// new Rectangle(11, 6, 20, 100);
 	
 	Point waterTL = null;
 	Point waterBR = null;
 	
+	public boolean pretendThatThereIsNoWater = false;
+	
+	public Rectangle getWater() {
+		if(pretendThatThereIsNoWater)
+			return null;
+		else
+			return water;
+	}
+
 	public void report(Agent agent, Perception p){
 		//a[p.mypos.x][p.mypos.y] = p.inwater;
 		if(p.inwater){

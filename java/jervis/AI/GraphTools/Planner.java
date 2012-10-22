@@ -150,25 +150,25 @@ public class Planner {
 				ArrayList<Edge> l =  new ArrayList<Edge>(4);
 				if(x-1 >= 0){
 					Vertex v = getVertex(x-1,y);
-					Edge e = new Edge(v, myCost + v.myCost);
+					Edge e = new Edge(v, myCost);
 					l.add(e);
 				}
 				
 				if(x+1 < 60){
 					Vertex v = getVertex(x+1,y);
-					Edge e = new Edge(v, myCost + v.myCost);
+					Edge e = new Edge(v, myCost);
 					l.add(e);
 				}
 				
 				if(y-1 >= 0){
 					Vertex v = getVertex(x,y-1);
-					Edge e = new Edge(v, myCost + v.myCost);
+					Edge e = new Edge(v, myCost);
 					l.add(e);
 				}
 				
 				if(y+1 < 60){
 					Vertex v = getVertex(x,y+1);
-					Edge e = new Edge(v, myCost + v.myCost);
+					Edge e = new Edge(v, myCost);
 					l.add(e);
 				}
 			

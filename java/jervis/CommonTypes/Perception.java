@@ -25,6 +25,7 @@ public class Perception {
 	public final int jasonId;
 	public final boolean inwater;
 	public final int myteamtimeleft;
+	public final boolean highlighted;
 	 
 	static boolean broadcastWarningDone = false;  
 	
@@ -43,6 +44,7 @@ public class Perception {
 		Integer myteamtimeleft = null;
 		Integer jasonId = null;		
 		boolean inwater = false;
+		boolean highlighted = false;
 		
 		
 		Iterator<Literal> iter = bb.iterator();
@@ -116,6 +118,10 @@ public class Perception {
 				inwater = true;
 				break;
 				
+			case highlighted:
+				highlighted = true;
+				break;				
+				
 			default:
 				break;
 			}
@@ -138,6 +144,7 @@ public class Perception {
 		this.time = time;
 		this.myteamtimeleft = myteamtimeleft;
 		this.inwater = inwater;
+		this.highlighted = highlighted;
 		
 
 	}

@@ -20,6 +20,7 @@ public class Agent {
 	public Food onFood = null;
 	public int time = 1;
 	public boolean inwater = false;
+	public boolean hightlighted;
 	
 	public Command nextCommand = null;
 	
@@ -70,6 +71,7 @@ public class Agent {
     	silent = !(time > 1);
     	
     	inwater = p.inwater;
+    	hightlighted = p.highlighted;
     	
     	this.jasonId = p.jasonId; 
     	/*if(p.idFromName != order){

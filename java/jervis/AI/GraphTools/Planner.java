@@ -136,39 +136,39 @@ public class Planner {
 			
 			public Vertex(int x, int y, int heuristic) {
 				super(x,y);
-				this.heuristic = heuristic; 
+				boolean axis = (x == target.x || x == start.x || y == start.y || y == target.y);
+				this.heuristic = axis?heuristic:heuristic * 100; 
 				
 				int localEnergyUsage = state.waterManager.isWater(new Point(x,y)) ? 5*Config.waterCostFactor : 5;				
 				boolean enemyPresent = state.isObstacle(agent, x, y);
 				boolean edgy = x < 10 || y < 10 || y > 49 || x > 49;
 				
-				this.myCost = localEnergyUsage + (enemyPresent?1000:0) + (edgy?1:0);  
-				
+				this.myCost = localEnergyUsage * 100 * 100 + (enemyPresent?1000000:0) + (edgy?50*100:0);
 			}
 
 			private ArrayList<Edge> getEdges() {
 				ArrayList<Edge> l =  new ArrayList<Edge>(4);
 				if(x-1 >= 0){
 					Vertex v = getVertex(x-1,y);
-					Edge e = new Edge(v, v.myCost);
+					Edge e = new Edge(v, myCost + v.myCost);
 					l.add(e);
 				}
 				
 				if(x+1 < 60){
 					Vertex v = getVertex(x+1,y);
-					Edge e = new Edge(v, v.myCost);
+					Edge e = new Edge(v, myCost + v.myCost);
 					l.add(e);
 				}
 				
 				if(y-1 >= 0){
 					Vertex v = getVertex(x,y-1);
-					Edge e = new Edge(v, v.myCost);
+					Edge e = new Edge(v, myCost + v.myCost);
 					l.add(e);
 				}
 				
 				if(y+1 < 60){
 					Vertex v = getVertex(x,y+1);
-					Edge e = new Edge(v, v.myCost);
+					Edge e = new Edge(v, myCost + v.myCost);
 					l.add(e);
 				}
 			
@@ -177,7 +177,7 @@ public class Planner {
 		}
 		
 		private int h(int x, int y) {
-			return (Math.abs(target.x-x)+Math.abs(target.y-y))*5;
+			return (Math.abs(target.x-x)+Math.abs(target.y-y))*5*100;
 		}
 	}	
 }

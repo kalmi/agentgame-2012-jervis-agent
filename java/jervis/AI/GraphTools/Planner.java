@@ -27,14 +27,17 @@ public class Planner {
 		this.state = state;
 		this.agent = agent;
 	}
-		
+	
+	public static int compareInt(int x, int y) {
+		 return (x < y) ? -1 : ((x == y) ? 0 : 1);
+	}
 	
 	public LinkedList<Point> plan(){
 		Set<Vertex> closed =  new HashSet<Vertex>();
 		Set<Vertex> open =  new HashSet<Vertex>();
 		PriorityQueue<Vertex> openListInProcessingOrder = new PriorityQueue<Vertex>(11, new Comparator<Vertex>() {
 			public int compare(Vertex o1, Vertex o2) {
-				return Double.compare((o1.bestCost+o1.heuristic), (o2.bestCost+o2.heuristic));
+				return compareInt((o1.bestCost+o1.heuristic), (o2.bestCost+o2.heuristic));
 			}
 		});
 		
@@ -59,7 +62,7 @@ public class Planner {
 			List<Vertex> candidates = new ArrayList<Vertex>();
 			for (Edge e : current.getEdges()) {
 				Vertex v = e.v;
-				double possibleNewBestCost = current.bestCost + e.weight;
+				int possibleNewBestCost = current.bestCost + e.weight;
 				if(possibleNewBestCost < v.bestCost){
 					v.bestCost = possibleNewBestCost;
 					v.reachedFrom = current;
@@ -96,70 +99,64 @@ public class Planner {
 		}
 		
 		private Vertex generateVertex(int x, int y) {
-			double heuristic = h(x,y);
+			int heuristic = h(x,y);
 			Vertex v = new Vertex(x,y,heuristic);
 			return v;
 		}
 
 		class Edge {
-			public Edge(Vertex v, double d) {
+			public Edge(Vertex v, int d) {
 				this.v = v;
 				this.weight = d;
 			}
 			final public Vertex v;
-			final public double weight;
+			final public int weight;
 		}
 		
 		@SuppressWarnings("serial")
 		class Vertex extends Point{
 			public Vertex reachedFrom;
-			public double bestCost = Integer.MAX_VALUE;
-			public double possibleNewBestCost;
+			public int bestCost = Integer.MAX_VALUE - 100000;
+			public int possibleNewBestCost;
 			
-			public final double heuristic;
-			public final int localEnergyUsage;
+			public final int heuristic;
+			public final int myCost;
 			
-			public Vertex(int x, int y, double heuristic) {
+			public Vertex(int x, int y, int heuristic) {
 				super(x,y);
 				this.heuristic = heuristic; 
-				localEnergyUsage = state.waterManager.isWater(new Point(x,y)) ? 5*Config.waterCostFactor : 5;
+				
+				int localEnergyUsage = state.waterManager.isWater(new Point(x,y)) ? 5*Config.waterCostFactor : 5;				
+				boolean enemyPresent = state.isObstacle(agent, x, y);
+				boolean edgy = x < 10 || y < 10 || y > 49 || x > 49;
+				
+				this.myCost = localEnergyUsage + (enemyPresent?1000:0) + (edgy?1:0);  
+				
 			}
 
 			private ArrayList<Edge> getEdges() {
-				ArrayList<Edge> l =  new ArrayList<Edge>();
+				ArrayList<Edge> l =  new ArrayList<Edge>(4);
 				if(x-1 >= 0){
-					Point p = new Point(x-1,y);
-					Vertex v = getVertex(p);
-					boolean enemyPresent = state.isObstacle(agent, p);
-					boolean edgy = p.x < 10 || p.y < 10 || p.y > 49 || p.x > 49;
-					Edge e = new Edge(v, v.localEnergyUsage + (enemyPresent?1000:0) + (edgy?0.1:0));
+					Vertex v = getVertex(x-1,y);
+					Edge e = new Edge(v, v.myCost);
 					l.add(e);
 				}
 				
 				if(x+1 < 60){
-					Point p = new Point(x+1,y);
-					Vertex v = getVertex(p);
-					boolean enemyPresent = state.isObstacle(agent, p);
-					boolean edgy = p.x < 10 || p.y < 10 || p.y > 49 || p.x > 49;
-					Edge e = new Edge(v, v.localEnergyUsage + (enemyPresent?1000:0) + (edgy?0.1:0));
+					Vertex v = getVertex(x+1,y);
+					Edge e = new Edge(v, v.myCost);
 					l.add(e);
 				}
 				
 				if(y-1 >= 0){
-					Point p = new Point(x,y-1);
-					Vertex v = getVertex(p);
-					boolean enemyPresent = state.isObstacle(agent, p);
-					boolean edgy = p.x < 10 || p.y < 10 || p.y > 49 || p.x > 49;
-					Edge e = new Edge(v, v.localEnergyUsage + (enemyPresent?1000:0) + (edgy?0.1:0));
+					Vertex v = getVertex(x,y-1);
+					Edge e = new Edge(v, v.myCost);
 					l.add(e);
 				}
 				
 				if(y+1 < 60){
-					Point p = new Point(x,y+1);
-					Vertex v = getVertex(p);
-					boolean enemyPresent = state.isObstacle(agent, p);
-					boolean edgy = p.x < 10 || p.y < 10 || p.y > 49 || p.x > 49;
-					Edge e = new Edge(v, v.localEnergyUsage + (enemyPresent?1000:0) + (edgy?0.1:0));
+					Vertex v = getVertex(x,y+1);
+					Edge e = new Edge(v, v.myCost);
 					l.add(e);
 				}
 			
@@ -167,8 +164,8 @@ public class Planner {
 			}
 		}
 		
-		private double h(int x, int y) {
-			return (Math.abs(target.x-x)+Math.abs(target.y-y))*4.99;
+		private int h(int x, int y) {
+			return (Math.abs(target.x-x)+Math.abs(target.y-y))*5;
 		}
 	}	
 }

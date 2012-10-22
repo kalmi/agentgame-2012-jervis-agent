@@ -32,7 +32,11 @@ public class State {
 	public int[][] obstacleTimes = new int[60][60];
 	
 	public boolean isObstacle(Agent me, Point point){
-		int t = obstacleTimes[point.x][point.y];
+		return isObstacle(me, point.x, point.y);
+	}
+	
+	public boolean isObstacle(Agent me, int x, int y){
+		int t = obstacleTimes[x][y];
 		int expires = t + 5;
 		return  !(expires <= me.time);
 	}

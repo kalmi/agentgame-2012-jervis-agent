@@ -8,7 +8,8 @@ public class Config {
 	 public static int numOfEnemy;
 	 public static int numOfAll;
 	 
-	 public static final int waterCostFactor = 10;
+	 public static final int numOfWaters = 2;
+	 public static final int waterCostFactor = 20;
 	 
 	 
 	 public static void populate(String[] names){

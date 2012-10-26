@@ -137,13 +137,13 @@ public class Planner {
 			public Vertex(int x, int y, int heuristic) {
 				super(x,y);
 				boolean axis = (x == target.x || x == start.x || y == start.y || y == target.y);
-				this.heuristic = axis?heuristic:heuristic * 10; 
+				this.heuristic = axis?heuristic:heuristic * 20; 
 				
 				int localEnergyUsage = state.waterManager.isWater(new Point(x,y)) ? 5*Config.waterCostFactor : 5;				
 				boolean enemyPresent = state.isObstacle(agent, x, y);
 				boolean edgy = x < 10 || y < 10 || y > 49 || x > 49;
 				
-				this.myCost = localEnergyUsage*10*10 + (enemyPresent?(60+60)*50*10*21+1:0) + (edgy?1:0);
+				this.myCost = localEnergyUsage*10*20 + (enemyPresent?(60+60)*50*20*21+1:0) + (edgy?1:0);
 			}
 
 			private ArrayList<Edge> getEdges() {

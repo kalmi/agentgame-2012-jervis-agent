@@ -45,7 +45,7 @@ public class Controller {
 						
 			double estimated_required_time = time_per_round * rounds_left;
 			
-			if(time_left < 80 && estimated_required_time + safetyMargin > time_left && p.time > 1000){
+			if(time_left < 50 && estimated_required_time + safetyMargin > time_left && p.time > 1000){
 				int N = 250;
 				System.out.print("Round #");
 				System.out.println(p.time);
@@ -233,6 +233,22 @@ public class Controller {
 		if(me.onFood != null){
 			return new Eat(); 
 		} else {
+			int lastConsumedAt = state.last4Consumption.isEmpty()? Integer.MIN_VALUE : state.last4Consumption.getNewest();
+			int lastNewSeen = state.last4NewSeen.isEmpty()? Integer.MIN_VALUE : state.last4NewSeen.getNewest();
+			boolean doWeGetToEat = lastConsumedAt+50*4 > me.getInternalTime();
+			state.waterManager.pretendThatThereIsNoWater =  !doWeGetToEat && lastConsumedAt != Integer.MIN_VALUE;
+			
+			if(me.time % 100 == 0 && me.order == 0){
+				System.out.print(doWeGetToEat);
+				System.out.print(' ');
+				System.out.print(lastConsumedAt);
+				System.out.print(' ');
+				System.out.print(me.getInternalTime());
+				System.out.print(' ');
+				System.out.println(state.waterManager.pretendThatThereIsNoWater);
+				
+			}
+			
 			if(helper == me && me.position.equals(agentInNeed.position)){
 				Command command = new Transfer(me, agentInNeed, me.energy/2);
 				agentInNeed.replanSceduled = true;
@@ -272,12 +288,12 @@ public class Controller {
 				replanNeeded  = true;
 			}
 			
-			int lastConsumedAt = state.last4Consumption.isEmpty()? Integer.MIN_VALUE : state.last4Consumption.getNewest();
+			
 			if(lastConsumedAt >= me.getInternalTime() - Config.numOfAll){
 				replanNeeded  = true;
 			}
 			
-			int lastNewSeen = state.last4NewSeen.isEmpty()? Integer.MIN_VALUE : state.last4NewSeen.getNewest();
+			
 			if(lastNewSeen == me.getInternalTime()){
 				replanNeeded = true;
 			}
@@ -296,8 +312,6 @@ public class Controller {
 				}
 			}			
 			
-			boolean doWeGetToEat = lastNewSeen+50 > me.time || lastConsumedAt+50 > me.time;
-			state.waterManager.pretendThatThereIsNoWater =  !doWeGetToEat && !state.last4NewSeen.isEmpty();
 			if(state.waterManager.pretendThatThereIsNoWater && !pretendNotificationDone){
 				System.out.println("OMG... My algorithm is a bit retarded.");
 				pretendNotificationDone = true;

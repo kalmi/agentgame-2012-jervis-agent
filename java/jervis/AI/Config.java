@@ -10,6 +10,7 @@ public class Config {
 	 
 	 public static final int numOfWaters = 2;
 	 public static final int waterCostFactor = 20;
+	 public static final int waterCoveragePercent = 4;
 	 
 	 
 	 public static void populate(String[] names){

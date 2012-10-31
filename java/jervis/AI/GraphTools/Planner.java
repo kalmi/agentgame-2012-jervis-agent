@@ -139,10 +139,10 @@ public class Planner {
 				boolean axis = (x == target.x || x == start.x || y == start.y || y == target.y);
 				this.heuristic = axis?heuristic:heuristic * 20; 
 				
-				int localEnergyUsage = state.waterManager.isWater(x,y) ? 5*Config.waterCostFactor : 5;				
+				double waterProb = state.waterManager.getWaterProbability(x, y);
+				int localEnergyUsage = (int) (5*(1-waterProb) + (5*Config.waterCostFactor)*waterProb);				
 				boolean enemyPresent = state.isObstacle(agent, x, y);
-				boolean edgy = x < 10 || y < 10 || y > 49 || x > 49;
-				
+				boolean edgy = (x < 10 || y < 10 || y > 49 || x > 49) && (agent.time>400);
 				this.myCost = localEnergyUsage*10*20 + (enemyPresent?(60+60)*50*20*21+1:0) + (edgy?1:0);
 			}
 

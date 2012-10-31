@@ -18,12 +18,16 @@ public class WaterManager {
 		
 	public boolean pretendThatThereIsNoWater = false;
 	
-	public boolean isWater(int x, int y) {
+	public double getWaterProbability(int x, int y) {
 		if(pretendThatThereIsNoWater)
-			return false;
-		else{
-			return waters.contains(x, y);
-		}
+			return 0;
+		else if(a[x][y]==FieldState.non_water)
+			return 0;
+		else if(waters.contains(x, y))
+			return 1;
+		else
+			return 0.1;
+		
 	}
 
 	int numOfVisitedWaterCells = 0;
@@ -59,19 +63,22 @@ public class WaterManager {
 		if(p.inwater && a[x][y] != FieldState.water){
 			latestPoint = new Point(x,y);
 			lastFoundWater = latestPoint; 
-			changed = !isWater(x, y);
+			changed = !waters.contains(x, y);
 			numOfVisitedWaterCells++;
 			a[x][y] = FieldState.water;
+			if(agent.time < 400)
+				agent.replanSceduled = true;
 		}
 		
 		if(!p.inwater && a[x][y] != FieldState.non_water){
 			latestPoint = new Point(x,y);
-			changed = isWater(x, y);
+			changed = waters.contains(x, y);
 			a[x][y] = FieldState.non_water;
+			if(agent.time < 400)
+				agent.replanSceduled = true;
 		}
 		
 		if(changed){
-			agent.replanSceduled = true;
 			long startTime = System.currentTimeMillis();
 			determineWater();
 			long estimatedTime = System.currentTimeMillis() - startTime;
@@ -99,7 +106,7 @@ public class WaterManager {
 		initial.rectangles[0] = new Rectangle(lastFoundWater.x, lastFoundWater.y, 1, 1);
 		candidates.add(initial);
 		
-		int range = 1;
+		int range = 0;
 		while(range <= range_limit){
 			for (int i = 0; i < range; i++) {
 				int y = initial_y + range - i;

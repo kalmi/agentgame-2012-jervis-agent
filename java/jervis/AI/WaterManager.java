@@ -5,11 +5,15 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
+import jervis.AI.Debug.DebugToggle;
+import jervis.AI.Debug.WaterDisplay;
 import jervis.CommonTypes.Perception;
 
 public class WaterManager {
 	FieldState[][] a = new FieldState[60][60];	
 	Waters waters = new Waters(); 
+	
+	WaterDisplay waterDisplay = DebugToggle.GUIENABLED? new WaterDisplay() : null;
 	
 	Point latestPoint = null;
 	
@@ -19,15 +23,7 @@ public class WaterManager {
 	public boolean pretendThatThereIsNoWater = false;
 	
 	public double getWaterProbability(int x, int y) {
-		if(pretendThatThereIsNoWater)
-			return 0;
-		else if(a[x][y]==FieldState.non_water)
-			return 0;
-		else if(waters.contains(x, y))
-			return 1;
-		else
-			return 0.1;
-		
+		return waters.contains(x, y)? 1 : 0;
 	}
 
 	int numOfVisitedWaterCells = 0;
@@ -66,19 +62,16 @@ public class WaterManager {
 			changed = !waters.contains(x, y);
 			numOfVisitedWaterCells++;
 			a[x][y] = FieldState.water;
-			if(agent.time < 400)
-				agent.replanSceduled = true;
 		}
 		
 		if(!p.inwater && a[x][y] != FieldState.non_water){
 			latestPoint = new Point(x,y);
 			changed = waters.contains(x, y);
 			a[x][y] = FieldState.non_water;
-			if(agent.time < 400)
-				agent.replanSceduled = true;
 		}
 		
 		if(changed){
+			agent.replanSceduled = true;
 			long startTime = System.currentTimeMillis();
 			determineWater();
 			long estimatedTime = System.currentTimeMillis() - startTime;
@@ -136,10 +129,14 @@ public class WaterManager {
 		final int expectedSize = 60*60*Config.waterCoveragePercent/100;
 		double bestDiff = Double.MAX_VALUE;
 		Waters bestWaters = null;
+		
+		System.out.print("NumOfPW:");
+		System.out.println(candidates.size());
+		
 		for (Waters waters : candidates) {
 			double diff = Math.abs(expectedSize - waters.getAreaSum());
-			System.out.print("Diff: ");
-			System.out.println(diff);
+			//System.out.print("Diff: ");
+			//System.out.println(diff);
 			if(diff < bestDiff){
 				bestWaters = waters;
 				bestDiff = diff;
@@ -152,6 +149,14 @@ public class WaterManager {
 			System.out.println(bestDiff);
 			this.waters = bestWaters;
 			this.previousCandidates = candidates;
+			
+			int preExpandArea = waters.getAreaSum();
+			this.waters = this.waters.expand(2);
+			int postExpandArea = waters.getAreaSum();
+			System.out.print("ExDiff: ");
+			System.out.println(postExpandArea - preExpandArea);
+			if(waterDisplay!=null)
+				waterDisplay.draw(this);
 		}else{
 			System.out.println("bug (keeping previous belief)");
 			System.out.println(latestPoint);
@@ -262,6 +267,88 @@ public class WaterManager {
 			}
 			return result;
 		} 
+				
+		public Waters expand(int maxAmountInEveryDirection) {
+			Waters newWaters = new Waters();
+			for (int i = 0; i < rectangles.length; i++) {
+				if(rectangles[i]!=null)
+					newWaters.rectangles[i] = new Rectangle(rectangles[i]);
+			}
+			
+			for (int i = 0; i < maxAmountInEveryDirection; i++) {
+				for (Rectangle rectangle : newWaters.rectangles) {				
+					if(rectangle==null)
+						continue;
+					
+					if(canWaterRectangleBeExpandedUpwards(rectangle)){
+						rectangle.setLocation(rectangle.x, rectangle.y-1);
+						rectangle.setSize(rectangle.width, rectangle.height+1);
+					}
+					
+					if(canWaterRectangleBeExpandedDownwards(rectangle)){
+						rectangle.setLocation(rectangle.x, rectangle.y);
+						rectangle.setSize(rectangle.width, rectangle.height+1);
+					}
+					
+					if(canWaterRectangleBeExpandedLeftwards(rectangle)){
+						rectangle.setLocation(rectangle.x-1, rectangle.y);
+						rectangle.setSize(rectangle.width+1, rectangle.height);
+					}
+					
+					if(canWaterRectangleBeExpandedRightwards(rectangle)){
+						rectangle.setLocation(rectangle.x, rectangle.y);
+						rectangle.setSize(rectangle.width+1, rectangle.height);
+					}
+				}
+			}
+			return newWaters;
+		}
+
+		boolean canWaterRectangleBeExpandedUpwards(Rectangle r){
+			if(r.y == 0) return false;
+			
+			for (int j = 0; j < r.width; j++) {
+				if( a[r.x+j][r.y-1] == FieldState.non_water ){
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		boolean canWaterRectangleBeExpandedDownwards(Rectangle r){
+			final int bottom = r.y + r.height - 1; 
+			if(bottom == 59) return false;
+			
+			for (int j = 0; j < r.width; j++) {
+				if( a[r.x+j][bottom+1] == FieldState.non_water ){
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		boolean canWaterRectangleBeExpandedLeftwards(Rectangle r){
+			if(r.x == 0) return false;
+			
+			for (int j = 0; j < r.height; j++) {
+				if( a[r.x-1][r.y+j] == FieldState.non_water ){
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		boolean canWaterRectangleBeExpandedRightwards(Rectangle r){
+			final int rightside = r.x + r.width - 1; 
+			if(rightside == 59) return false;
+			
+			for (int j = 0; j < r.height; j++) {
+				if( a[rightside+1][r.y+j] == FieldState.non_water ){
+					return false;
+				}
+			}
+			return true;
+		}
 		
 		@Override
 		public boolean equals(Object other){

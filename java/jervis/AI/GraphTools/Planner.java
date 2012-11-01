@@ -55,7 +55,7 @@ public class Planner {
 		GraphProvider g = new GraphProvider(target);
 		
 		Vertex start = g.getVertex(this.start);		
-		start.bestCost = 0;
+		start.bestCost = start.myCost;
 		openListInProcessingOrder.add(start);
 		
 		while(!openListInProcessingOrder.isEmpty()){

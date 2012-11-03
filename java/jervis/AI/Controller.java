@@ -120,22 +120,22 @@ public class Controller {
 	List<ArrayList<Point>> waypointsPerAgent = new ArrayList<ArrayList<Point>>(){{
 		
 		add(new ArrayList<Point>(){{
-			add(new Point(10,10));
+			add(new Point(9,10));
 			add(new Point(28,10));
 		}});
 		
 		add(new ArrayList<Point>(){{
-			add(new Point(10,49));
+			add(new Point(10,50));
 			add(new Point(10,31));
 		}});
 		
 		add(new ArrayList<Point>(){{
-			add(new Point(49,49));
+			add(new Point(50,49));
 			add(new Point(31,49));
 		}});
 		
 		add(new ArrayList<Point>(){{
-			add(new Point(49,10));
+			add(new Point(49,9));
 			add(new Point(49,28));
 		}});
 		
@@ -227,7 +227,7 @@ public class Controller {
 	
 	Agent agentInNeed = null;
 	Agent helper = null;
-	boolean pretendNotificationDone = false;
+	int pretendNotificationDone = Integer.MIN_VALUE;
 	
 	private Command determineAppropiateCommandFor(Agent me) {
 		if(me.onFood != null){
@@ -312,9 +312,9 @@ public class Controller {
 				}
 			}			
 			
-			if(state.waterManager.pretendThatThereIsNoWater && !pretendNotificationDone){
-				System.out.println("OMG... My algorithm is a bit retarded.");
-				pretendNotificationDone = true;
+			if(state.waterManager.pretendThatThereIsNoWater && pretendNotificationDone + 100 < me.time){
+				System.out.println("IAMAJESUS" + Integer.toString(me.time));
+				pretendNotificationDone = me.time;
 			}
 			if(me.plan == null || me.plan.size() == 1 ||
 					(isWaypointReached(me) &&

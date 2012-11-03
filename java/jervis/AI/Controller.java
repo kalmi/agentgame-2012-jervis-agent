@@ -75,7 +75,8 @@ public class Controller {
 		agent.update(p);				
 		state.waterManager.report(agent, p);
 		state.processVisibleFoods(agent, p);
-		state.processEnemyAgents(agent, p);		
+		state.processEnemyAgents(agent, p);
+		state.seennessManager.report(agent);
 		state.simpleIsAlive = SimpleEnergyWatcher.run(p, state);
 		
 		Command command = determineAppropiateCommandFor(agent);

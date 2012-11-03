@@ -28,6 +28,7 @@ public class State {
 	public final WaterManager waterManager = new WaterManager();
 	
 	public final int[][] obstacleTimes = new int[60][60];
+	public final SeennessManager seennessManager = new SeennessManager();
 	
 	public boolean isObstacle(Agent me, Point point){
 		return isObstacle(me, point.x, point.y);

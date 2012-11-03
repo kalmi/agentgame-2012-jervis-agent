@@ -1,4 +1,4 @@
-package jervis.CommonTypes;
+package jervis;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -27,7 +27,8 @@ public class Perception {
 	public final int myteamtimeleft;
 	public final boolean highlighted;
 	 
-	static boolean broadcastWarningDone = false;  
+	static boolean broadcastWarningDone = false;
+	static boolean sneakAttackWarningDone = false; 
 	
 	public Perception(BeliefBase bb) {
 	
@@ -64,7 +65,18 @@ public class Perception {
 				}
 				continue;
 			}
-
+			
+			if(!(item.getSources().size()==1 && item.getSources().get(0).toString() == "percept")){
+				toBeRemoved.add(item);
+				
+				if(sneakAttackWarningDone == false){
+					System.out.println("-Sir, enemy used mind control. Functor: " + item.getFunctor());
+					sneakAttackWarningDone = true;
+				}
+				continue;
+			}
+				
+					
 			
 			switch (type) {
 			

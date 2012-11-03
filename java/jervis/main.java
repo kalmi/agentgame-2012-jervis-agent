@@ -31,7 +31,12 @@ public class main extends DefaultInternalAction{
 			main.controller = new Controller();
 		}
 		
-		controller.process(perception, ts.getUserAgArch());
+		if(InternalActionHandler.getMyName(ts, un, agent).startsWith("jervis")){
+			controller.process(perception, ts.getUserAgArch());
+		} else {
+			System.out.println("-Sir, enemy used mind control. It isn't very effective.");
+			System.out.println(agent.getBB().toString());
+		}
 		
 		
 		return true;

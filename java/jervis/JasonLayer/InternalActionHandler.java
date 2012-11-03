@@ -7,6 +7,7 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.ASSyntax;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
+import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 
 public class InternalActionHandler {
@@ -28,5 +29,14 @@ public class InternalActionHandler {
 			i++;
 		}
 		return r;
+	}
+	
+	public static String getMyName(TransitionSystem ts, final Unifier un, Agent agent) throws Exception {
+		Literal literal = ASSyntax.createVar();
+		InternalAction ia = agent.getIA(".my_name");
+		ia.execute(ts, un, new Term[]{literal});
+		literal.apply(un);
+		StringTerm my_name = (StringTerm) literal;
+		return my_name.toString();
 	}
 }

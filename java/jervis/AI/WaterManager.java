@@ -23,6 +23,8 @@ public class WaterManager {
 	public boolean pretendThatThereIsNoWater = false;
 	
 	public double getWaterProbability(int x, int y) {
+		if(pretendThatThereIsNoWater)
+			return 0;
 		return waters.contains(x, y)? 1 : 0;
 	}
 

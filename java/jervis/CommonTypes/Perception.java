@@ -1,4 +1,4 @@
-package jervis;
+package jervis.CommonTypes;
 
 import java.awt.Point;
 import java.util.ArrayList;

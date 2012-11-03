@@ -133,9 +133,9 @@ public class Agent {
 			System.out.println("---");
     }
     
-	public boolean isFacing(Point pos) {
+    private boolean isFacing(int x, int y) {
         int A = position.x + position.y, B = position.y - position.x,
-                C = pos.x + pos.y, D = pos.y - pos.x;
+                C = x + y, D = y - x;
 
         if (direction == MyDir.up) {
             return C <= A && D <= B;
@@ -146,13 +146,21 @@ public class Agent {
         } else {
             return C <= A && D >= B;
         }
+	}
+    
+	public boolean isFacing(Point pos) {
+		return isFacing(pos.x, pos.y);
     }
 
-    public boolean canSee(Point pos) {
-        if (Math.abs(position.x - pos.x) > 10 || Math.abs(position.y - pos.y) > 10) {
+	public boolean canSee(int x, int y) {
+        if (Math.abs(position.x - x) > 10 || Math.abs(position.y - y) > 10) {
             return false;
         }
-        return isFacing(pos); 
+        return isFacing(x,y); 
+	}
+
+	public boolean canSee(Point pos) {
+    	return canSee(pos.x, pos.y);
     }
     
     public String toString(){
@@ -184,4 +192,6 @@ public class Agent {
 		}
 		return energy;
 	}
+
+
 }

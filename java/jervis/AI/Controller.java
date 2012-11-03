@@ -76,7 +76,6 @@ public class Controller {
 		state.waterManager.report(agent, p);
 		state.processVisibleFoods(agent, p);
 		state.processEnemyAgents(agent, p);
-		state.seennessManager.report(agent);
 		state.simpleIsAlive = SimpleEnergyWatcher.run(p, state);
 		
 		Command command = determineAppropiateCommandFor(agent);
@@ -89,7 +88,8 @@ public class Controller {
 			agent.lastCommandFailed = false;
 			
 			if(command instanceof Move){
-				agent.plan.removeFirst();
+				if(agent.plan!=null)
+					agent.plan.removeFirst();
 				agent.lastSuccessfulMove = agent.time;
 			}
 		} else {
@@ -163,12 +163,7 @@ public class Controller {
 			target = agentInNeed.position;
 		} else {
 			
-			target = getCurrentWaypointTarget(me);
-			
-			if(isWaypointReached(me)){
-				waypointIdPerAgent[me.order] = (waypointIdPerAgent[me.order]+1) % waypointsPerAgent.get(me.order).size();
-				target = getCurrentWaypointTarget(me);
-			}
+			target = null;
 			
 			if(state.foods.size() != 0){
 				Point closestFood = null;
@@ -202,9 +197,12 @@ public class Controller {
 					goingForFood = true;
 				}
 			}
-		}	
-		Planner planner = new Planner(me.position, target, state, me);
-		me.plan = planner.plan();
+		}
+		me.plan = null;
+		if(target!=null){
+			Planner planner = new Planner(me.position, target, state, me);
+			me.plan = planner.plan();
+		}				
 		me.goingForFood = goingForFood || helper == me;
 	}
 	
@@ -317,14 +315,7 @@ public class Controller {
 				System.out.println("IAMAJESUS" + Integer.toString(me.time));
 				pretendNotificationDone = me.time;
 			}
-			if(me.plan == null || me.plan.size() == 1 ||
-					(isWaypointReached(me) &&
-							(state.enemyAgents.contains(getCurrentWaypointTarget(me)) ||
-							state.isObstacle(me, getCurrentWaypointTarget(me)))       )){
-				return new Wait();
-			} else {
-				if(!me.plan.get(0).equals(me.position))
-					System.out.println("Plan non-aghfgsdhkgsdhkhgkdj!");
+			if(me.plan != null){
 				Point nextPoint = me.plan.get(1);
 				
 				/*if(state.enemyAgents.contains(nextPoint)){
@@ -356,6 +347,39 @@ public class Controller {
 				}
 				
 				
+			}else{
+				int max = Integer.MIN_VALUE;
+				Command best = new Wait();
+				if(state.waterManager.getWaterProbability(me.position.x,me.position.y)!=1){
+				for (MyDir dir : MyDir.values()) {
+					int x = state.seennessManager.getAvgSeennessFor(me.position.x, me.position.y, dir, me.getInternalTime());
+					if(x>max){
+						max = x;
+						best = new Turn(dir);
+					}
+				}}
+				
+				for (MyDir dir : MyDir.values()) {
+					Move m = new Move(dir);
+					Point dest = m.getDestination(me);
+					if(!(dest.x>=60 || dest.y>=60 || dest.x<0 || dest.y<0)){
+						if(state.waterManager.getWaterProbability(dest.x,dest.y)==1 && !me.inwater)
+							continue;
+						
+						if(state.isObstacle(me, dest))
+							continue;
+
+						int x = state.seennessManager.getAvgSeennessFor(dest.x, dest.y, me.direction, me.getInternalTime());
+						if(x>max){
+							max = x;
+							best = m;
+						}
+					}
+				}
+				
+				
+				
+				return best;
 			}
 		}
 	}

@@ -77,8 +77,10 @@ public class WaterManager {
 			long startTime = System.currentTimeMillis();
 			determineWater();
 			long estimatedTime = System.currentTimeMillis() - startTime;
-			System.out.print("D took: ");
-			System.out.println(estimatedTime);
+			if(DebugToggle.ENABLED){
+				System.out.print("D took: ");
+				System.out.println(estimatedTime);
+			}
 		}
 	}
 		
@@ -92,8 +94,10 @@ public class WaterManager {
 		int end_y = waterBR.y;
 		
 		int range_limit = (end_x - initial_x) + (end_y - initial_y);
-		System.out.print("limit: ");
-		System.out.println(range_limit);
+		if(DebugToggle.ENABLED){
+			System.out.print("limit: ");
+			System.out.println(range_limit);
+		}
 		
 		List<Waters> candidates = new ArrayList<Waters>();
 		
@@ -132,31 +136,36 @@ public class WaterManager {
 		double bestDiff = Double.MAX_VALUE;
 		Waters bestWaters = null;
 		
-		System.out.print("NumOfPW:");
-		System.out.println(candidates.size());
+		if(DebugToggle.ENABLED){
+			System.out.print("NumOfPW:");
+			System.out.println(candidates.size());
+		}
 		
 		for (Waters waters : candidates) {
 			double diff = Math.abs(expectedSize - waters.getAreaSum());
-			//System.out.print("Diff: ");
-			//System.out.println(diff);
 			if(diff < bestDiff){
 				bestWaters = waters;
 				bestDiff = diff;
 			}
 		}
 
-
-		System.out.print("BestDiff: ");
+		if(DebugToggle.ENABLED){
+			System.out.print("BestDiff: ");
+		}
 		if(bestWaters!=null){
-			System.out.println(bestDiff);
+			if(DebugToggle.ENABLED){
+				System.out.println(bestDiff);
+			}
 			this.waters = bestWaters;
 			this.previousCandidates = candidates;
 			
 			int preExpandArea = waters.getAreaSum();
 			this.waters = this.waters.expand(2);
 			int postExpandArea = waters.getAreaSum();
-			System.out.print("ExDiff: ");
-			System.out.println(postExpandArea - preExpandArea);
+			if(DebugToggle.ENABLED){
+				System.out.print("ExDiff: ");
+				System.out.println(postExpandArea - preExpandArea);
+			}
 			if(waterDisplay!=null)
 				waterDisplay.draw(this);
 		}else{

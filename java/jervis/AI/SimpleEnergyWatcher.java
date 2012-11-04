@@ -1,10 +1,13 @@
 package jervis.AI;
 
+import jervis.CommonTypes.Food;
 import jervis.CommonTypes.Perception;
 
 
 public class SimpleEnergyWatcher {
 	static Integer otherTeamCollectiveEnergyLastRound = null;
+	public static Integer simpleIsWaitingSince = null;
+	private static int simpleIsWaitingCounter = 0;
 	
 	static boolean run(Perception p, State state){		
 		
@@ -15,6 +18,26 @@ public class SimpleEnergyWatcher {
 			Agent agent = state.getAgent(p.idFromName);
 			if(otherTeamCollectiveEnergyLastRound != null){
 				boolean simpleAteThisRound = (otherTeamCollectiveEnergy>otherTeamCollectiveEnergyLastRound+6);
+				boolean simpleIsWaitingSinceLastAgent = !simpleAteThisRound && otherTeamCollectiveEnergy>otherTeamCollectiveEnergyLastRound-4;
+				
+				if(simpleIsWaitingSinceLastAgent){
+					simpleIsWaitingCounter++;
+				} else {
+					simpleIsWaitingCounter = 0;
+				}
+				
+				if(simpleIsWaitingCounter>Config.numOfAll){
+					if(simpleIsWaitingSince == null){
+						simpleIsWaitingSince = agent.getInternalTime();
+						//System.out.println("WB");
+					}
+				} else if(simpleIsWaitingSince != null){
+					simpleIsWaitingSince = null;
+					for (Food food : state.foods) {
+						food.unreachableAt = null;
+					}
+					//System.out.println("WE");
+				}
 				
 				if(simpleAteThisRound) {
 					Stat.logSimpleEat();

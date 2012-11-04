@@ -6,6 +6,7 @@ import java.awt.Point;
 public class Food extends Point {
 	
 	public int value = -1; 
+	public Integer unreachableAt = null;
 	
 	public Food() {
 		

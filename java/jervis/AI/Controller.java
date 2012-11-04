@@ -10,6 +10,7 @@ import jason.architecture.AgArch;
 import jason.asSemantics.ActionExec;
 
 import jervis.AI.GraphTools.Planner;
+import jervis.CommonTypes.Food;
 import jervis.CommonTypes.MyDir;
 import jervis.CommonTypes.Perception;
 import jervis.JasonLayer.Commands.*;
@@ -99,7 +100,7 @@ public class Controller {
 				Move lastMove = (Move)command;
 				agent.replanSceduled = true;
 				Point destination = lastMove.getDestination(agent);
-				state.obstacleTimes[destination.x][destination.y] = agent.time;  
+				state.obstacleTimes[destination.x][destination.y] = agent.getInternalTime();  
 				state.foods.remove(destination);
 			}
 		}
@@ -159,6 +160,7 @@ public class Controller {
 		boolean goingForFood = false;
 		
 		Point target;
+		Food targetFood = null;
 		if(helper == me){
 			target = agentInNeed.position;
 		} else {
@@ -166,9 +168,14 @@ public class Controller {
 			target = null;
 			
 			if(state.foods.size() != 0){
-				Point closestFood = null;
+				Food closestFood = null;
 				int closestDistance = Integer.MAX_VALUE;
-				for (Point food : state.foods){
+				for (Food food : state.foods){
+					 
+					if(food.unreachableAt != null && SimpleEnergyWatcher.simpleIsWaitingSince!=null && food.unreachableAt>=SimpleEnergyWatcher.simpleIsWaitingSince){
+						continue;
+					}
+					
 					Agent closestToAgent = null;
 					int closestDistanceToAgent = Integer.MAX_VALUE;
 					
@@ -194,6 +201,7 @@ public class Controller {
 				}
 				if(closestFood!=null){
 					target = closestFood;
+					targetFood = closestFood;
 					goingForFood = true;
 				}
 			}
@@ -202,7 +210,10 @@ public class Controller {
 		if(target!=null){
 			Planner planner = new Planner(me.position, target, state, me);
 			me.plan = planner.plan();
-		}				
+		}
+		if(targetFood!=null && me.plan == null){
+			targetFood.unreachableAt = me.getInternalTime();
+		}
 		me.goingForFood = goingForFood || helper == me;
 	}
 	
@@ -237,7 +248,7 @@ public class Controller {
 			boolean doWeGetToEat = lastConsumedAt+50*4 > me.getInternalTime();
 			state.waterManager.pretendThatThereIsNoWater =  !doWeGetToEat && lastConsumedAt != Integer.MIN_VALUE;
 			
-			if(me.time % 100 == 0 && me.order == 0){
+			/*if(me.time % 100 == 0 && me.order == 0){
 				System.out.print(doWeGetToEat);
 				System.out.print(' ');
 				System.out.print(lastConsumedAt);
@@ -246,7 +257,7 @@ public class Controller {
 				System.out.print(' ');
 				System.out.println(state.waterManager.pretendThatThereIsNoWater);
 				
-			}
+			}*/
 			
 			if(helper == me && me.position.equals(agentInNeed.position)){
 				Command command = new Transfer(me, agentInNeed, me.energy/2);

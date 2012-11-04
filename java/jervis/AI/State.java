@@ -36,7 +36,12 @@ public class State {
 	
 	public boolean isObstacle(Agent me, int x, int y){
 		int t = obstacleTimes[x][y];
-		int expires = t + 5;
+		
+		if(SimpleEnergyWatcher.simpleIsWaitingSince!=null){
+			return t>=SimpleEnergyWatcher.simpleIsWaitingSince; 
+		}
+		
+		int expires = t + 5*Config.numOfJervis;
 		return  !(expires <= me.time);
 	}
 	
@@ -75,7 +80,7 @@ public class State {
 			for (PerceivedAgent otherAgent : p.visibleAgents) {
 				if(otherAgent.teamId != p.myteam){
 					list.add(otherAgent);
-					obstacleTimes[otherAgent.x][otherAgent.y] = agent.time;  
+					obstacleTimes[otherAgent.x][otherAgent.y] = agent.getInternalTime();  
 					Stat.logSimpleSeen();
 				}
 			}

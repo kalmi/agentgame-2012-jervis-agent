@@ -20,6 +20,7 @@ public class Turn extends Command {
 			agent.direction = dir;	
 			agent.energy -= 2 * (agent.inwater? Config.waterCostFactor : 1);
 		}
+    state.seennessManager.report(agent);
 	}
 
 }

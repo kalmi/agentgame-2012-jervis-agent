@@ -37,11 +37,11 @@ public class Controller {
 		if(p.time > 1000 && state.agentsInOrder[0].jasonId == p.jasonId && playDeadTill < p.time){
 			int safetyMargin = 2;
 			
-			int time_used = 120 - p.myteamtimeleft;
+			int time_used = 150 - p.myteamtimeleft;
 			double time_per_round = ((double)time_used) / p.time;
 			
 			int rounds_left = 15000 - p.time;			
-			int time_left = 120 - time_used;
+			int time_left = 150 - time_used;
 						
 			double estimated_required_time = time_per_round * rounds_left;
 			
@@ -305,82 +305,141 @@ public class Controller {
 				replanEverything();
 			}
 			
-			if(!me.goingForFood){
+			/*if(!me.goingForFood){
 				if(lastConsumedAt >= me.getInternalTime() - 3*6){
 					return new Turn(me.direction.cwNext());
 				}
-			}			
+			}*/			
 			
 			if(state.waterManager.pretendThatThereIsNoWater && pretendNotificationDone + 100 < me.time){
 				System.out.println("IAMAJESUS" + Integer.toString(me.time));
 				pretendNotificationDone = me.time;
 			}
-			if(me.plan != null){
-				Point nextPoint = me.plan.get(1);
-				
-				/*if(state.enemyAgents.contains(nextPoint)){
-					replanNeeded = true;
-					return new Wait();
-				}*/
-
-				MyDir dir = null;
-				if(nextPoint.x>me.position.x){
-					dir = MyDir.right;
-				}
-				if(nextPoint.x<me.position.x){
-					dir = MyDir.left;
-				}
-				if(nextPoint.y>me.position.y){
-					dir = MyDir.down;
-				}
-				if(nextPoint.y<me.position.y){
-					dir = MyDir.up;
-				}
-				
-				if(me.goingForFood){
-					return new Move(dir);
-				} else {
-					if(me.direction != dir)
-						return new Turn(dir);
-					else
-						return new Move(dir);
-				}
-				
-				
+			if(me.plan != null && me.plan.size() >=2){
+				return getNextStepOfPlan(me);
 			}else{
+				
+				if(me.plan != null)
+					me.plan = null;
+				
 				int max = Integer.MIN_VALUE;
 				Command best = new Wait();
+				
+				Point closestLand = null;
+				
+				if(me.inwater){
+					int distanceCheck = 0;
+					boolean bug = false;
+					while(closestLand==null || bug){
+						bug = true;
+						distanceCheck++;
+						for (MyDir dir : MyDir.values()) {
+							int dy = 0, dx = 0;
+							switch (dir) {
+							case up:
+								dy -= distanceCheck;
+								break;
+								
+							case right:
+								dx += distanceCheck;
+								break;
+								
+							case down:
+								dy += distanceCheck;
+								break;
+								
+							case left:
+								dx -= distanceCheck;
+								break;						
+							}
+							int x = me.position.x + dx;
+							int y = me.position.y + dy;
+							if(x>=60 || y>=60 || x<0 || y<0)
+								continue;
+							
+							bug = false;
+							
+							if(state.waterManager.getWaterProbability(x,y)==0 && !state.isObstacle(me,x,y)){
+								closestLand = new Point(x,y);
+								Planner planner = new Planner(me.position, closestLand, state, me);
+								me.plan = planner.plan();
+								return getNextStepOfPlan(me);
+							}
+						}
+					}
+					System.out.println("No land!?"); 
+				}
+				
+
+				
+				
+				for (MyDir dir : MyDir.values()) {
+					Move m = new Move(dir);
+					Point dest = m.getDestination(me);
+					
+					if(dest.x>=60 || dest.y>=60 || dest.x<0 || dest.y<0)
+						continue;
+				
+					
+					if(state.isObstacle(me, dest))
+						continue;
+
+					int x = state.seennessManager.getAvgSeennessFor(dest.x, dest.y, me.direction, me.getInternalTime(), state);
+					
+					if(state.waterManager.getWaterProbability(dest.x,dest.y)==1)
+						x*=0.1;
+					
+					if(x>max){
+						max = x;
+						best = m;
+					}
+				}
+				
 				if(state.waterManager.getWaterProbability(me.position.x,me.position.y)!=1){
 				for (MyDir dir : MyDir.values()) {
-					int x = state.seennessManager.getAvgSeennessFor(me.position.x, me.position.y, dir, me.getInternalTime());
+					int x = state.seennessManager.getAvgSeennessFor(me.position.x, me.position.y, dir, me.getInternalTime(), state);
 					if(x>max){
 						max = x;
 						best = new Turn(dir);
 					}
 				}}
 				
-				for (MyDir dir : MyDir.values()) {
-					Move m = new Move(dir);
-					Point dest = m.getDestination(me);
-					if(!(dest.x>=60 || dest.y>=60 || dest.x<0 || dest.y<0)){
-						if(state.waterManager.getWaterProbability(dest.x,dest.y)==1 && !me.inwater)
-							continue;
-						
-						if(state.isObstacle(me, dest))
-							continue;
-
-						int x = state.seennessManager.getAvgSeennessFor(dest.x, dest.y, me.direction, me.getInternalTime());
-						if(x>max){
-							max = x;
-							best = m;
-						}
-					}
-				}
 				
-				
-				
+				//System.out.println(best.toString());
 				return best;
 			}
+		}
+	}
+
+	private Command getNextStepOfPlan(Agent me) {
+		Point nextPoint = me.plan.get(1);
+		
+		/*if(state.enemyAgents.contains(nextPoint)){
+			replanNeeded = true;
+			return new Wait();
+		}*/
+
+		MyDir dir = null;
+		if(nextPoint.x>me.position.x){
+			dir = MyDir.right;
+		}
+		if(nextPoint.x<me.position.x){
+			dir = MyDir.left;
+		}
+		if(nextPoint.y>me.position.y){
+			dir = MyDir.down;
+		}
+		if(nextPoint.y<me.position.y){
+			dir = MyDir.up;
+		}
+		
+		if(me.goingForFood){
+			return new Move(dir);
+		} else {
+			if(me.direction != dir)
+				return new Turn(dir);
+			else
+				return new Move(dir);
 		}
 	}
 	

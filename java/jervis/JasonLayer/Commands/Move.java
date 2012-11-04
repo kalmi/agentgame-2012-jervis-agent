@@ -38,6 +38,7 @@ public class Move extends Command {
 			}
 			
 			agent.energy -= 5 * (agent.inwater? Config.waterCostFactor : 1);
+      state.seennessManager.report(agent);
 		}
 	}
 	

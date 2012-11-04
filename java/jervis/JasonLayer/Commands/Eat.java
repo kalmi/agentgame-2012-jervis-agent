@@ -33,7 +33,7 @@ public class Eat extends Command {
 			state.last4Consumption.insert(agent.getInternalTime());
 			Stat.logEatFinshed(agent);
 		}
-		
+		state.seennessManager.report(agent);
 	}
 
 }

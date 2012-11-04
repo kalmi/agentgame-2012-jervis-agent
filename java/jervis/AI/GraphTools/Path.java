@@ -22,5 +22,4 @@ public class Path extends LinkedList<Point>{
 		return r.toString();		
 	}
 	*/
-	
 }

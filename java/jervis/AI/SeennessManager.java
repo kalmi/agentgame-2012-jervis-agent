@@ -17,14 +17,26 @@ public class SeennessManager {
 	}
 	
 	
-	public int getAvgSeennessFor(int x, int y, MyDir dir, int currentInternalTime){
+	public int getAvgSeennessFor(int x, int y, MyDir dir, int currentInternalTime, State state){
 		int i = 0;
 		int sum = 0;
+		int possible_number_of_foods = 0;
 		for (Point p : getAllVisibleFields(x,y,dir)) {
 			i++;
-			sum+= (currentInternalTime-lastSeen[p.x][p.y]);
-		}
-		return sum/i;
+			sum += currentInternalTime - lastSeen[p.x][p.y];
+			
+			int possible_number_of_foods_here = 0;
+			for (Integer consumption : state.last4Consumption.buf) {
+				if(consumption==null)
+					consumption = 0;
+								
+				if(lastSeen[p.x][p.y]<consumption)
+					possible_number_of_foods_here++;
+				
+			}
+			possible_number_of_foods += possible_number_of_foods_here;
+		}		
+		return possible_number_of_foods*1000 + sum;
 	}
 	
 	

@@ -12,7 +12,7 @@ import java.util.RandomAccess;
 public class CircularArrayList<E> extends AbstractList<E> implements RandomAccess {
 
 private final int n; // buffer length
-private final List<E> buf; // a List implementing RandomAccess
+public final List<E> buf; // a List implementing RandomAccess
 private int leader = 0;
 private int size = 0;
 

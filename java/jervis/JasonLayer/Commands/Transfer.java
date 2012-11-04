@@ -24,6 +24,8 @@ public class Transfer extends Command {
 	public void pretend(Agent agent, State state) {
 		source.energy -= amount;
 		target.energy += amount*0.95;
+    
+    state.seennessManager.report(agent);
 	}
 
 }

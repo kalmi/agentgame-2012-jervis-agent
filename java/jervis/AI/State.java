@@ -22,7 +22,7 @@ public class State {
 	
 	public List<Food> foods = new ArrayList<Food>();
 	
-	public final CircularArrayList<Integer> last4Consumption = new CircularArrayList<Integer>(4);
+	public final CircularArrayList<Integer> last4Consumption = new CircularArrayList<Integer>(10);
 	public final CircularArrayList<Integer> last4NewSeen = new CircularArrayList<Integer>(4);
 
 	public final WaterManager waterManager = new WaterManager();

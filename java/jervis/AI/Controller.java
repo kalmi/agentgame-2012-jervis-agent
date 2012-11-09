@@ -34,20 +34,28 @@ public class Controller {
 	};
 
 	int playDeadTill = 0; 
+	public int skipTick = 0;
+	Integer initalTimeLeft = null;
 	public void process(Perception p, AgArch agArch) {
-		if(p.time > 1000 && state.agentsInOrder[0].jasonId == p.jasonId && playDeadTill < p.time){
+		if(initalTimeLeft == null && p.time >= 2){
+			initalTimeLeft = p.myteamtimeleft;
+			//System.out.print("IT: ");
+			//System.out.println(initalTimeLeft);
+		}
+		
+		if(p.time > 50 && state.agentsInOrder[0].jasonId == p.jasonId && playDeadTill < p.time){
 			int safetyMargin = 2;
 			
-			int time_used = 150 - p.myteamtimeleft;
+			int time_used = initalTimeLeft - p.myteamtimeleft;
 			double time_per_round = ((double)time_used) / p.time;
 			
 			int rounds_left = 15000 - p.time;			
-			int time_left = 150 - time_used;
+			int time_left = initalTimeLeft - time_used;
 						
 			double estimated_required_time = time_per_round * rounds_left;
 			
-			if(time_left < 50 && estimated_required_time + safetyMargin > time_left && p.time > 1000){
-				int N = 250;
+			if(estimated_required_time + safetyMargin > time_left && p.time > 50){
+				int N = 1000;
 				System.out.print("Round #");
 				System.out.println(p.time);
 				System.out.print("Estimated required time: " );
@@ -58,9 +66,14 @@ public class Controller {
 				System.out.println("---");
 				playDeadTill = p.time + N;
 				
+				skipTick = N*Config.numOfJervis; 
+				
 				for (Agent agent : state.agentsInOrder) {
 					agent.lastSuccessfulMove += N;
+					agent.plan = null;
 				}
+				
+				state.foods.clear();
 			}
 		}
 		
@@ -246,15 +259,17 @@ public class Controller {
 		if(me.onFood != null){
 			return new Eat(); 
 		} else {
-			int unreacable_food_count = 0;
-			for (Food food : state.foods) {
-				if(food.unreachableAt != null && SimpleEnergyWatcher.simpleIsWaitingSince!=null && food.unreachableAt>=SimpleEnergyWatcher.simpleIsWaitingSince){
-					unreacable_food_count++;
+			if(SimpleEnergyWatcher.simpleIsWaitingSince!=null){
+				int unreacable_food_count = 0;
+				for (Food food : state.foods) {
+					if(food.unreachableAt != null && food.unreachableAt>=SimpleEnergyWatcher.simpleIsWaitingSince){
+						unreacable_food_count++;
+					}
 				}
-			}
-			
-			if(unreacable_food_count>=3){
-				return new Wait();
+				
+				if(unreacable_food_count>=3){
+					return new Wait();
+				}
 			}
 			
 			int lastConsumedAt = state.last4Consumption.isEmpty()? Integer.MIN_VALUE : state.last4Consumption.getNewest();

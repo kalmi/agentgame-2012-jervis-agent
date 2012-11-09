@@ -79,6 +79,9 @@ public class Controller {
 		state.processEnemyAgents(agent, p);
 		state.simpleIsAlive = SimpleEnergyWatcher.run(p, state);
 		
+		if(state.oD!=null)
+			state.oD.draw(state, agent);	
+		
 		Command command = determineAppropiateCommandFor(agent);
 		
 		ActionExec action = command.toAction();
@@ -243,9 +246,20 @@ public class Controller {
 		if(me.onFood != null){
 			return new Eat(); 
 		} else {
+			int unreacable_food_count = 0;
+			for (Food food : state.foods) {
+				if(food.unreachableAt != null && SimpleEnergyWatcher.simpleIsWaitingSince!=null && food.unreachableAt>=SimpleEnergyWatcher.simpleIsWaitingSince){
+					unreacable_food_count++;
+				}
+			}
+			
+			if(unreacable_food_count>=3){
+				return new Wait();
+			}
+			
 			int lastConsumedAt = state.last4Consumption.isEmpty()? Integer.MIN_VALUE : state.last4Consumption.getNewest();
 			int lastNewSeen = state.last4NewSeen.isEmpty()? Integer.MIN_VALUE : state.last4NewSeen.getNewest();
-			boolean doWeGetToEat = lastConsumedAt+50*4 > me.getInternalTime();
+			boolean doWeGetToEat = lastConsumedAt+200*Config.numOfJervis > me.getInternalTime();
 			state.waterManager.pretendThatThereIsNoWater =  !doWeGetToEat && lastConsumedAt != Integer.MIN_VALUE;
 			
 			/*if(me.time % 100 == 0 && me.order == 0){

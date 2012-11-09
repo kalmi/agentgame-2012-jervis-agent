@@ -54,7 +54,7 @@ public class Planner {
 		
 		GraphProvider g = new GraphProvider(target);
 		
-		Vertex start = g.getVertex(this.start);		
+		Vertex start = g.getVertex(this.start, true);		
 		start.bestCost = start.myCost;
 		openListInProcessingOrder.add(start);
 		
@@ -100,10 +100,24 @@ public class Planner {
 		}
 		
 		public Vertex getVertex(Point point){
-			return getVertex(point.x, point.y);
+			return getVertex(point.x, point.y, false);
+		}
+		
+		public Vertex getVertex(Point point, boolean ignoreEnemy){
+			return getVertex(point.x, point.y, ignoreEnemy);
 		}
 		
 		public Vertex getVertex(int x, int y){
+			return getVertex(x, y, false);
+		}
+		
+		public Vertex getVertex(int x, int y, boolean ignoreEnemy){
+			
+			boolean enemyPresent = state.isObstacle(agent, x, y);
+			boolean is_target = (target.x == x && target.y == y);
+			if(enemyPresent && !ignoreEnemy && !is_target)
+				return null;
+			
 			if(generatedVertices[x][y] == null){
 				generatedVertices[x][y] = generateVertex(x,y);
 			}
@@ -150,26 +164,34 @@ public class Planner {
 				ArrayList<Edge> l =  new ArrayList<Edge>(4);
 				if(x-1 >= 0){
 					Vertex v = getVertex(x-1,y);
-					Edge e = new Edge(v, myCost);
-					l.add(e);
+					if(v!=null){
+						Edge e = new Edge(v, myCost);
+						l.add(e);
+					}
 				}
 				
 				if(x+1 < 60){
 					Vertex v = getVertex(x+1,y);
-					Edge e = new Edge(v, myCost);
-					l.add(e);
+					if(v!=null){
+						Edge e = new Edge(v, myCost);
+						l.add(e);
+					}
 				}
 				
 				if(y-1 >= 0){
 					Vertex v = getVertex(x,y-1);
-					Edge e = new Edge(v, myCost);
-					l.add(e);
+					if(v!=null){
+						Edge e = new Edge(v, myCost);
+						l.add(e);
+					}
 				}
 				
 				if(y+1 < 60){
 					Vertex v = getVertex(x,y+1);
-					Edge e = new Edge(v, myCost);
-					l.add(e);
+					if(v!=null){
+						Edge e = new Edge(v, myCost);
+						l.add(e);
+					}
 				}
 			
 				return l;

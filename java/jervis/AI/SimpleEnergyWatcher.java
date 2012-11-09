@@ -29,14 +29,14 @@ public class SimpleEnergyWatcher {
 				if(simpleIsWaitingCounter>Config.numOfAll){
 					if(simpleIsWaitingSince == null){
 						simpleIsWaitingSince = agent.getInternalTime();
-						//System.out.println("WB");
+						//System.out.println("B");
 					}
 				} else if(simpleIsWaitingSince != null){
 					simpleIsWaitingSince = null;
 					for (Food food : state.foods) {
 						food.unreachableAt = null;
 					}
-					//System.out.println("WE");
+					//System.out.println("E");
 				}
 				
 				if(simpleAteThisRound) {

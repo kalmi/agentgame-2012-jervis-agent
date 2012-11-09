@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import jervis.AI.Debug.DebugToggle;
 import jervis.AI.Utils.CircularArrayList;
 import jervis.CommonTypes.Food;
 import jervis.CommonTypes.PerceivedAgent;
@@ -30,6 +31,8 @@ public class State {
 	public final int[][] obstacleTimes = new int[60][60];
 	public final SeennessManager seennessManager = new SeennessManager();
 	
+	public final ObstacleDisplay oD = DebugToggle.GUIENABLED? new ObstacleDisplay() : null;
+	
 	public boolean isObstacle(Agent me, Point point){
 		return isObstacle(me, point.x, point.y);
 	}
@@ -37,12 +40,15 @@ public class State {
 	public boolean isObstacle(Agent me, int x, int y){
 		int t = obstacleTimes[x][y];
 		
-		if(SimpleEnergyWatcher.simpleIsWaitingSince!=null){
-			return t>=SimpleEnergyWatcher.simpleIsWaitingSince; 
+		
+		//System.out.print("W: ");
+		//System.out.println(SimpleEnergyWatcher.simpleIsWaitingSince);
+		if(SimpleEnergyWatcher.simpleIsWaitingSince!=null && t>=SimpleEnergyWatcher.simpleIsWaitingSince){
+			return true; 
 		}
 		
 		int expires = t + 5*Config.numOfJervis;
-		return  !(expires <= me.time);
+		return  !(expires <= me.getInternalTime());
 	}
 	
 	public State() {

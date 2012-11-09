@@ -18,11 +18,9 @@ public class SeennessManager {
 	
 	
 	public int getAvgSeennessFor(int x, int y, MyDir dir, int currentInternalTime, State state){
-		int i = 0;
 		int sum = 0;
 		int possible_number_of_foods = 0;
 		for (Point p : getAllVisibleFields(x,y,dir)) {
-			i++;
 			sum += currentInternalTime - lastSeen[p.x][p.y];
 			
 			int possible_number_of_foods_here = 0;

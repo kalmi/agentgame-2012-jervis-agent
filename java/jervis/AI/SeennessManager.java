@@ -2,17 +2,31 @@ package jervis.AI;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Stack;
 
 import jervis.CommonTypes.MyDir;
 
 public class SeennessManager {
 
-	final int[][] lastSeen= new int[60][60]; //contains internalTime
+	Stack<int[]> stack = new Stack<int[]>();
+	int[] lastSeen= new int[60*60]; //contains internalTime
+	
+	public void push(){
+		stack.push(lastSeen.clone());
+	}
+	
+	public void pop(){
+		lastSeen = stack.pop();
+	}
 	
 	public void report(Agent me){
 		int internalTime = me.getInternalTime();
-		for (Point p : getAllVisibleFields(me.position.x,me.position.y,me.direction)) {
-			lastSeen[p.x][p.y] = internalTime;
+		report(internalTime, me.position, me.direction);
+	}
+	
+	public void report(int internalTime, Point pos, MyDir dir){
+		for (Point p : getAllVisibleFields(pos.x, pos.y, dir)) {
+			lastSeen[p.x*60 + p.y] = internalTime;
 		}
 	}
 	
@@ -21,14 +35,14 @@ public class SeennessManager {
 		int sum = 0;
 		int possible_number_of_foods = 0;
 		for (Point p : getAllVisibleFields(x,y,dir)) {
-			sum += currentInternalTime - lastSeen[p.x][p.y];
+			sum += currentInternalTime - lastSeen[p.x*60 + p.y];
 			
 			int possible_number_of_foods_here = 0;
 			for (Integer consumption : state.last4Consumption.buf) {
 				if(consumption==null)
 					consumption = 0;
 								
-				if(lastSeen[p.x][p.y]<consumption)
+				if(lastSeen[p.x *60 + p.y]<consumption)
 					possible_number_of_foods_here++;
 				
 			}

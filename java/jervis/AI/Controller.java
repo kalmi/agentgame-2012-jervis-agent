@@ -34,19 +34,27 @@ public class Controller {
 	};
 
 	int playDeadTill = 0; 
+	public int skipTick = 0;
+	Integer initalTimeLeft = null;
 	public void process(Perception p, AgArch agArch) {
+		if(initalTimeLeft == null && p.time >= 2){
+			initalTimeLeft = p.myteamtimeleft;
+			//System.out.print("IT: ");
+			//System.out.println(initalTimeLeft);
+		}
+		
 		if(p.time > 1000 && state.agentsInOrder[0].jasonId == p.jasonId && playDeadTill < p.time){
 			int safetyMargin = 2;
 			
-			int time_used = 150 - p.myteamtimeleft;
+			int time_used = initalTimeLeft - p.myteamtimeleft;
 			double time_per_round = ((double)time_used) / p.time;
 			
 			int rounds_left = 15000 - p.time;			
-			int time_left = 150 - time_used;
+			int time_left = initalTimeLeft - time_used;
 						
 			double estimated_required_time = time_per_round * rounds_left;
 			
-			if(time_left < 50 && estimated_required_time + safetyMargin > time_left && p.time > 1000){
+			if(estimated_required_time + safetyMargin > time_left && p.time > 1000){
 				int N = 250;
 				System.out.print("Round #");
 				System.out.println(p.time);
@@ -58,9 +66,14 @@ public class Controller {
 				System.out.println("---");
 				playDeadTill = p.time + N;
 				
+				skipTick = N*Config.numOfJervis; 
+				
 				for (Agent agent : state.agentsInOrder) {
 					agent.lastSuccessfulMove += N;
+					agent.plan = null;
 				}
+				
+				state.foods.clear();
 			}
 		}
 		
@@ -246,15 +259,17 @@ public class Controller {
 		if(me.onFood != null){
 			return new Eat(); 
 		} else {
-			int unreacable_food_count = 0;
-			for (Food food : state.foods) {
-				if(food.unreachableAt != null && SimpleEnergyWatcher.simpleIsWaitingSince!=null && food.unreachableAt>=SimpleEnergyWatcher.simpleIsWaitingSince){
-					unreacable_food_count++;
+			if(SimpleEnergyWatcher.simpleIsWaitingSince!=null){
+				int unreacable_food_count = 0;
+				for (Food food : state.foods) {
+					if(food.unreachableAt != null && food.unreachableAt>=SimpleEnergyWatcher.simpleIsWaitingSince){
+						unreacable_food_count++;
+					}
 				}
-			}
-			
-			if(unreacable_food_count>=3){
-				return new Wait();
+				
+				if(unreacable_food_count>=3){
+					return new Wait();
+				}
 			}
 			
 			int lastConsumedAt = state.last4Consumption.isEmpty()? Integer.MIN_VALUE : state.last4Consumption.getNewest();
@@ -347,11 +362,8 @@ public class Controller {
 				if(me.plan != null)
 					me.plan = null;
 				
-				int max = Integer.MIN_VALUE;
-				Command best = new Wait();
-				
-				Point closestLand = null;
-				
+			
+				Point closestLand = null;				
 				if(me.inwater){
 					int distanceCheck = 0;
 					boolean bug = false;
@@ -394,46 +406,90 @@ public class Controller {
 					}
 					System.out.println("No land!?"); 
 				}
-				
-
-				
-				
-				for (MyDir dir : MyDir.values()) {
-					Move m = new Move(dir);
-					Point dest = m.getDestination(me);
-					
-					if(dest.x>=60 || dest.y>=60 || dest.x<0 || dest.y<0)
-						continue;
-				
-					
-					if(state.isObstacle(me, dest))
-						continue;
-
-					int x = state.seennessManager.getAvgSeennessFor(dest.x, dest.y, me.direction, me.getInternalTime(), state);
-					
-					if(state.waterManager.getWaterProbability(dest.x,dest.y)==1)
-						x*=0.1;
-					
-					if(x>max){
-						max = x;
-						best = m;
-					}
-				}
-				
-				if(state.waterManager.getWaterProbability(me.position.x,me.position.y)!=1){
-				for (MyDir dir : MyDir.values()) {
-					int x = state.seennessManager.getAvgSeennessFor(me.position.x, me.position.y, dir, me.getInternalTime(), state);
-					if(x>max){
-						max = x;
-						best = new Turn(dir);
-					}
-				}}
-				
-				
-				//System.out.println(best.toString());
-				return best;
+								
+				return findBestMoveBasedOnSeenness(me);
 			}
 		}
+	}
+
+	private Command findBestMoveBasedOnSeenness(Agent me) {
+		lSearch(me.direction, me.position, me.getInternalTime(), 0);
+		return lSearchBestCommand;
+	}
+
+	private final int LSEARCH_DEPTH_LIMIT = 2;
+	private Command lSearchBestCommand; 
+	private int lSearch(final MyDir enter_direction, final Point enter_position, final int internal_time, final int depth) {
+		
+		if(depth>=LSEARCH_DEPTH_LIMIT)
+			return 0;
+		
+		
+		
+		int max = Integer.MIN_VALUE;
+		Command best = new Wait();
+		
+		//MOVE
+		for (MyDir dir : MyDir.values()) {
+			final MyDir agent_direction = enter_direction;
+			final Point agent_position = MyDir.movePoint(enter_position, dir);
+			
+			if(agent_position.x>=60 || agent_position.y>=60 || agent_position.x<0 || agent_position.y<0 || state.isObstacle(internal_time, agent_position))
+				continue;
+			
+			if(depth+1<LSEARCH_DEPTH_LIMIT)
+				state.seennessManager.push();
+
+			int desirability = state.seennessManager.getAvgSeennessFor(agent_position.x, agent_position.y, agent_direction, internal_time, state);
+			
+			if(depth+1<LSEARCH_DEPTH_LIMIT)
+				state.seennessManager.report(internal_time, agent_position, agent_direction);
+			
+			if(depth+1<LSEARCH_DEPTH_LIMIT)
+				desirability += lSearch(agent_direction, agent_position, internal_time + Config.numOfJervis, depth+1);
+			
+			if(state.waterManager.getWaterProbability(agent_position.x, agent_position.y)==1)
+				desirability*=0.1;
+			
+			if(desirability>max){
+				max = desirability;
+				best = new Move(dir);
+			}
+			if(depth+1<LSEARCH_DEPTH_LIMIT)
+				state.seennessManager.pop();
+		}
+		
+		//TURN
+		if(state.waterManager.getWaterProbability(enter_position.x, enter_position.y)!=1){
+			for (MyDir dir : MyDir.values()) {
+				if(dir == enter_direction)
+					continue;
+				
+				final MyDir agent_direction = dir;
+				final Point agent_position = enter_position;
+				
+				if(depth+1<LSEARCH_DEPTH_LIMIT)
+					state.seennessManager.push();
+				
+				int desirability = state.seennessManager.getAvgSeennessFor(agent_position.x, agent_position.y, agent_direction, internal_time, state);
+				if(depth+1<LSEARCH_DEPTH_LIMIT)
+					state.seennessManager.report(internal_time, agent_position, agent_direction);
+				
+				if(depth+1<LSEARCH_DEPTH_LIMIT)
+					desirability += lSearch(agent_direction, agent_position, internal_time + Config.numOfJervis, depth+1);
+				
+				if(desirability>max){
+					max = desirability;
+					best = new Turn(dir);
+				}
+				if(depth+1<LSEARCH_DEPTH_LIMIT)
+					state.seennessManager.pop();
+			}
+		}
+		
+		
+		lSearchBestCommand = best;
+		return max;
 	}
 
 	private Command getNextStepOfPlan(Agent me) {

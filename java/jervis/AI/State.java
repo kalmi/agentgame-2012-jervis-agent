@@ -33,6 +33,10 @@ public class State {
 	
 	public final ObstacleDisplay oD = DebugToggle.GUIENABLED? new ObstacleDisplay() : null;
 	
+	public boolean isObstacle(int internalTime, Point point){
+		return isObstacle(internalTime, point.x, point.y);
+	}
+	
 	public boolean isObstacle(Agent me, Point point){
 		return isObstacle(me, point.x, point.y);
 	}
@@ -49,6 +53,17 @@ public class State {
 		
 		int expires = t + 5*Config.numOfJervis;
 		return  !(expires <= me.getInternalTime());
+	}
+	
+	public boolean isObstacle(int internalTime, int x, int y){
+		int t = obstacleTimes[x][y];
+	
+		if(SimpleEnergyWatcher.simpleIsWaitingSince!=null && t>=SimpleEnergyWatcher.simpleIsWaitingSince){
+			return true; 
+		}
+		
+		int expires = t + 5*Config.numOfJervis;
+		return  !(expires <= internalTime);
 	}
 	
 	public State() {

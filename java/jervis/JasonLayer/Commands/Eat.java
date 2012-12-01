@@ -6,6 +6,7 @@ import jervis.AI.State;
 import jervis.CommonTypes.Food;
 
 
+
 public class Eat extends Command {
 
 	public Eat() {
@@ -17,15 +18,15 @@ public class Eat extends Command {
 		Food food = agent.onFood;
 		
 		int change;
-		if(food.value > 200){
-			change = 200;
+		if(food.value > 20){
+			change = 20;
 		} else {
 			change = food.value;
 		}
 		
 		agent.energy += change;		
 		agent.onFood.value -= change;		
-		agent.onFood.value -= 50;
+		agent.onFood.value -= 5;
 		
 		if(agent.onFood.value <= 0){
 			agent.onFood = null;

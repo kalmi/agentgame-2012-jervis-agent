@@ -1,5 +1,7 @@
 # Jervis (AgentGame 2012 winner)
 
+[![fog of war video](media/output.gif)](https://vimeo.com/232976281)
+
 Jervis is an agent made for the AgentGame 2012 competition that was organized by BME MIT. It finished first in all 7 rounds. This repository contains the final version that was submitted for the last round. All code for previous rounds can be found in the repo's history including the early AgentSpeak-only versions.
 
 ## Notable features
@@ -14,7 +16,7 @@ This results in interesting and useful emergent behaviours, such as:
  - Agents don't go too close to the edge of the map.
  - Agents can simply be denied entry to the size-limited "expensive" water tiles during scavenging, and they still do fine
  
-I created an semi-transparent overlay for displaying fog of darkness and the emergent behaviours. Video: https://vimeo.com/232976281
+I created an semi-transparent overlay for displaying fog of darkness and the emergent behaviours. This can be seen in the video.
 
 ### Java
 
